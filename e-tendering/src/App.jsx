@@ -143,7 +143,7 @@ function App() {
 
     return (
       <div className="login-container">
-        <h2>Login to Tender Management System</h2>
+        <h2>Login to Tender System</h2>
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label>Email</label>
