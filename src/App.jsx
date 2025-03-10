@@ -6,7 +6,7 @@ import {
   Navigate,
 } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Login from "./components/Login";
+import Login from "./components/Login/Login";
 import TenderList from "./components/TenderList";
 import SubmitBid from "./components/SubmitBid";
 import "./App.css";
@@ -55,6 +55,10 @@ function App() {
     setBids([...bids, newBid]);
   };
 
+  const addTender = (newTender) => {
+    setTenders([...tenders, newTender]);
+  };
+
   return (
     <Router>
       <div className="app">
@@ -74,12 +78,13 @@ function App() {
             path="/tenders"
             element={
               isAuthenticated ? (
-                <TenderList tenders={tenders} />
+                <TenderList tenders={tenders} addTender={addTender} /> // Added addTender prop
               ) : (
                 <Navigate to="/login" />
               )
             }
           />
+          <Route path="" />
           <Route
             path="/tender/:id/bid"
             element={

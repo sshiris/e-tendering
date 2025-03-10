@@ -13,7 +13,7 @@ function Navbar({ isAuthenticated, handleLogout }) {
           <button onClick={handleLogout}>Logout</button>
         </>
       ) : (
-        <button onClick={() => navigate("/login")}>Login</button>
+        <p></p>
       )}
     </nav>
   );
