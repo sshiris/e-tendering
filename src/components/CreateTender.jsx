@@ -2,13 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function CreateTender({ addTender, setShowForm }) {
+  const today = new Date().toISOString().split("T")[0];
+
   const navigate = useNavigate();
   const [newTender, setNewTender] = useState({
     id: "",
     name: "",
-    notice: "",
-    close: "",
-    winner: "",
+    notice: today,
+    close: today,
+    disclosingWinner: today,
     status: "",
   });
 
@@ -19,7 +21,7 @@ export default function CreateTender({ addTender, setShowForm }) {
       name: newTender.name,
       notice: newTender.notice,
       close: newTender.close,
-      winner: newTender.winner,
+      disclosingWinner: newTender.disclosingWinner,
       status: newTender.status,
     };
 
@@ -28,7 +30,7 @@ export default function CreateTender({ addTender, setShowForm }) {
       name: "",
       notice: "",
       close: "",
-      winner: "",
+      disclosingWinner: "",
       status: "Open",
     });
 
@@ -83,8 +85,8 @@ export default function CreateTender({ addTender, setShowForm }) {
           <label>Date of Disclosing Winner:</label>
           <input
             type="date"
-            name="winner"
-            value={newTender.winner}
+            name="disclosingWinner"
+            value={newTender.disclosingWinner}
             onChange={handleInputChange}
           />
         </div>

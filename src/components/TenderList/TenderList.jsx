@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./TenderList.css";
-function TenderList({ tenders, lastId }) {
+function TenderList({ tenders, lastId, isAuthenticated }) {
   const navigate = useNavigate();
   return (
     <div>
@@ -25,7 +25,7 @@ function TenderList({ tenders, lastId }) {
               <td>{tender.name}</td>
               <td>{tender.notice}</td>
               <td>{tender.close}</td>
-              <td>{tender.winner}</td>
+              <td>{tender.disclosingWinner}</td>
               <td>{tender.status}</td>
               <td>
                 <button
@@ -41,9 +41,11 @@ function TenderList({ tenders, lastId }) {
         </tbody>
       </table>
 
-      <button onClick={() => navigate("/create-tender")}>
-        Register Tender
-      </button>
+      {isAuthenticated && (
+        <button onClick={() => navigate("/create-tender")}>
+          Register Tender
+        </button>
+      )}
     </div>
   );
 }

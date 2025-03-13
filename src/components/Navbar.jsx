@@ -6,14 +6,16 @@ function Navbar({ isAuthenticated, handleLogout }) {
 
   return (
     <nav>
-      <span>Tender System</span>
       {isAuthenticated ? (
         <>
           <button onClick={() => navigate("/tenders")}>Tenders</button>
           <button onClick={handleLogout}>Logout</button>
         </>
       ) : (
-        <p></p>
+        <>
+          <button onClick={() => navigate("/")}>Tenders</button>
+          <button onClick={() => navigate("/login")}>Login</button>
+        </>
       )}
     </nav>
   );

@@ -4,7 +4,10 @@
   padding: 2rem;
   text-align: center;
 }
-
+* {
+  background-color: rgb(105, 152, 193);
+  color: #000000aa;
+}
 .logo {
   height: 6em;
   padding: 1.5em;

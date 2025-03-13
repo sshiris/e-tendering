@@ -19,6 +19,7 @@ function App() {
   const [bids, setBids] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [lastId, setLastId] = useState(0);
+
   useEffect(() => {
     const mockTenders = [];
     setTenders(mockTenders);
@@ -32,8 +33,6 @@ function App() {
       };
       setIsAuthenticated(true);
       setUser([...user, newUser]);
-
-      //Use JSON.stringify for the back-end
     }
   };
 
@@ -61,36 +60,33 @@ function App() {
         <Navbar isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
         <Routes>
           <Route
+            path="/"
+            element={
+              <TenderList
+                tenders={tenders}
+                lastId={lastId}
+                isAuthenticated={isAuthenticated}
+              />
+            }
+          />
+          <Route
             path="/login"
             element={
               !isAuthenticated ? (
                 <Login handleLogin={handleLogin} />
               ) : (
-                <Navigate to="/tenders" />
-              )
-            }
-          />
-          <Route
-            path="/tenders"
-            element={
-              isAuthenticated ? (
-                <TenderList
-                  tenders={tenders}
-                  setShowForm={setShowForm}
-                  lastId={lastId}
-                />
-              ) : (
-                <Navigate to="/login" />
+                <Navigate to="/" />
               )
             }
           />
           <Route
             path="/create-tender"
             element={
-              <CreateTender
-                addTender={addTender}
-                setShowForm={setShowForm}
-              ></CreateTender>
+              isAuthenticated ? (
+                <CreateTender addTender={addTender} setShowForm={setShowForm} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
@@ -103,7 +99,7 @@ function App() {
               )
             }
           />
-          <Route path="*" element={<Navigate to="/tenders" />} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
     </Router>
