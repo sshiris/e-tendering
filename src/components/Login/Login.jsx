@@ -14,7 +14,7 @@ function Login({ handleLogin }) {
 
   return (
     <div>
-      <h2>Login</h2>
+      <h2 className="heading">Login</h2>
       <form onSubmit={handleSubmit}>
         <input
           type="email"

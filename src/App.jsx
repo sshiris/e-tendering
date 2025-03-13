@@ -62,11 +62,7 @@ function App() {
           <Route
             path="/"
             element={
-              <TenderList
-                tenders={tenders}
-                lastId={lastId}
-                isAuthenticated={isAuthenticated}
-              />
+              <TenderList tenders={tenders} isAuthenticated={isAuthenticated} />
             }
           />
           <Route
@@ -83,7 +79,11 @@ function App() {
             path="/create-tender"
             element={
               isAuthenticated ? (
-                <CreateTender addTender={addTender} setShowForm={setShowForm} />
+                <CreateTender
+                  addTender={addTender}
+                  setShowForm={setShowForm}
+                  lastId={lastId}
+                />
               ) : (
                 <Navigate to="/login" />
               )

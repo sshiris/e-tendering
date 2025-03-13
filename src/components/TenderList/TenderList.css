@@ -7,3 +7,8 @@ td {
   border-collapse: collapse;
   padding: 10px;
 }
+
+#tender-search {
+  position: relative;
+  top: -15px;
+}

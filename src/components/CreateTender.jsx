@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function CreateTender({ addTender, setShowForm }) {
+export default function CreateTender({ addTender, setShowForm, lastId }) {
   const today = new Date().toISOString().split("T")[0];
 
   const navigate = useNavigate();
   const [newTender, setNewTender] = useState({
-    id: "",
+    id: lastId + 1,
     name: "",
     notice: today,
     close: today,
