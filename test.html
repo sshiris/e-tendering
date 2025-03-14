@@ -3,155 +3,187 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест API e-Tendering</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        input, button { margin: 5px; padding: 8px; }
-        .container { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; }
-    </style>
-</head>
-<body>
-    <h1>Тест API e-Tendering</h1>
-
-    <div class="container">
-        <h2>Создать пользователя</h2>
-        <input type="text" id="user_name" placeholder="Имя пользователя">
-        <input type="email" id="user_email" placeholder="Email">
-        <button onclick="createUser()">Создать</button>
-        <p id="user_response"></p>
-    </div>
-
-    <div class="container">
-        <h2>Создать категорию</h2>
-        <input type="text" id="category_name" placeholder="Название категории">
-        <button onclick="createCategory()">Создать</button>
-        <p id="category_response"></p>
-    </div>
-
-    <div class="container">
-        <h2>Добавить пользователя в категорию</h2>
-        <input type="text" id="user_id_category" placeholder="ID пользователя">
-        <input type="text" id="category_id_user" placeholder="ID категории">
-        <button onclick="addUserToCategory()">Добавить</button>
-        <p id="user_category_response"></p>
-    </div>
-
-    <div class="container">
-        <h2>Создать тендер</h2>
-        <input type="text" id="tender_name" placeholder="Название тендера">
-        <input type="date" id="construction_from">
-        <input type="date" id="construction_to">
-        <button onclick="createTender()">Создать</button>
-        <p id="tender_response"></p>
-    </div>
-
-    <div class="container">
-        <h2>Сделать ставку</h2>
-        <input type="text" id="bidder_id" placeholder="ID участника">
-        <input type="text" id="tender_id" placeholder="ID тендера">
-        <input type="number" id="bidding_price" placeholder="Цена">
-        <button onclick="createBid()">Сделать ставку</button>
-        <p id="bid_response"></p>
-    </div>
-
-    <div class="container">
-        <h2>Показать все данные</h2>
-        <button onclick="fetchAllData()">Загрузить</button>
-        <pre id="all_data"></pre>
-    </div>
-
+    <title>Test API</title>
     <script>
-        const API_URL = "http://localhost:5500"; // API-сервер
+        // Функция для отправки POST-запроса для создания пользователя
+        async function createUser() {
+            const userData = {
+                name: document.getElementById('userName').value,
+                email: document.getElementById('userEmail').value,
+                address: document.getElementById('userAddress').value,
+                user_type: document.getElementById('userType').value,
+                password: document.getElementById('userPassword').value,
+                categories: []  // Здесь нужно добавить ID категорий, если это необходимо
+            };
 
-        // Создать пользователя
-        function createUser() {
-            const name = document.getElementById("user_name").value;
-            const email = document.getElementById("user_email").value;
-
-            fetch(`${API_URL}/create_user`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email })
-            })
-            .then(res => res.json())
-            .then(data => document.getElementById("user_response").innerText = JSON.stringify(data))
-            .catch(err => console.error("Ошибка:", err));
+            try {
+                const response = await fetch('http://localhost:5500/create_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                const result = await response.json();
+                console.log(result);
+                alert('Пользователь создан успешно');
+            } catch (error) {
+                console.error('Error creating user:', error);
+                alert('Ошибка при создании пользователя');
+            }
         }
 
-        // Создать категорию
-        function createCategory() {
-            const category_name = document.getElementById("category_name").value;
+        // Функция для получения всех пользователей
+        async function fetchUsers() {
+            try {
+                const response = await fetch('http://localhost:5500/users');
+                const users = await response.json();
+                const usersList = document.getElementById('usersList');
+                usersList.innerHTML = ''; // Очистить список перед добавлением новых данных
 
-            fetch(`${API_URL}/create_category`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ category_name })
-            })
-            .then(res => res.json())
-            .then(data => document.getElementById("category_response").innerText = JSON.stringify(data))
-            .catch(err => console.error("Ошибка:", err));
+                users.forEach(user => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${user.name} (${user.email})`;
+                    usersList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Error fetching users:', error);
+                alert('Ошибка при получении пользователей');
+            }
         }
 
-        // Добавить пользователя в категорию
-        function addUserToCategory() {
-            const user_id = document.getElementById("user_id_category").value;
-            const category_id = document.getElementById("category_id_user").value;
+        // Функция для создания категории
+        async function createCategory() {
+            const categoryData = {
+                category_name: document.getElementById('categoryName').value
+            };
 
-            fetch(`${API_URL}/add_user_to_category`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ user_id, category_id })
-            })
-            .then(res => res.json())
-            .then(data => document.getElementById("user_category_response").innerText = JSON.stringify(data))
-            .catch(err => console.error("Ошибка:", err));
+            try {
+                const response = await fetch('http://localhost:5500/create_category', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(categoryData)
+                });
+                const result = await response.json();
+                console.log(result);
+                alert('Категория создана успешно');
+            } catch (error) {
+                console.error('Error creating category:', error);
+                alert('Ошибка при создании категории');
+            }
         }
 
-        // Создать тендер
-        function createTender() {
-            const tender_name = document.getElementById("tender_name").value;
-            const construction_from = document.getElementById("construction_from").value;
-            const construction_to = document.getElementById("construction_to").value;
+        // Функция для получения всех категорий
+        async function fetchCategories() {
+            try {
+                const response = await fetch('http://localhost:5500/categories');
+                const categories = await response.json();
+                const categoriesList = document.getElementById('categoriesList');
+                categoriesList.innerHTML = ''; // Очистить список перед добавлением новых данных
 
-            fetch(`${API_URL}/create_tender`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tender_name, construction_from, construction_to })
-            })
-            .then(res => res.json())
-            .then(data => document.getElementById("tender_response").innerText = JSON.stringify(data))
-            .catch(err => console.error("Ошибка:", err));
+                categories.forEach(category => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = category.category_name;
+                    categoriesList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+                alert('Ошибка при получении категорий');
+            }
         }
 
-        // Сделать ставку
-        function createBid() {
-            const bidder_id = document.getElementById("bidder_id").value;
-            const tender_id = document.getElementById("tender_id").value;
-            const bidding_price = document.getElementById("bidding_price").value;
+        // Функция для создания тендера
+        async function createTender() {
+            const tenderData = {
+                tender_name: document.getElementById('tenderName').value,
+                staff_id: document.getElementById('staffId').value,
+                construction_from: document.getElementById('constructionFrom').value,
+                construction_to: document.getElementById('constructionTo').value,
+                date_of_tender_notice: document.getElementById('dateOfTenderNotice').value,
+                date_of_tender_close: document.getElementById('dateOfTenderClose').value,
+                date_of_tender_winner: document.getElementById('dateOfTenderWinner').value,
+                bidding_price: document.getElementById('biddingPrice').value,
+                tender_status: document.getElementById('tenderStatus').value
+            };
 
-            fetch(`${API_URL}/create_bid`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ bidder_id, tender_id, bidding_price })
-            })
-            .then(res => res.json())
-            .then(data => document.getElementById("bid_response").innerText = JSON.stringify(data))
-            .catch(err => console.error("Ошибка:", err));
+            try {
+                const response = await fetch('http://localhost:5500/create_tender', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(tenderData)
+                });
+                const result = await response.json();
+                console.log(result);
+                alert('Тендер создан успешно');
+            } catch (error) {
+                console.error('Error creating tender:', error);
+                alert('Ошибка при создании тендера');
+            }
         }
 
-        // Получить все данные
-        function fetchAllData() {
-            Promise.all([
-                fetch(`${API_URL}/users`).then(res => res.json()),
-                fetch(`${API_URL}/categories`).then(res => res.json()),
-                fetch(`${API_URL}/tenders`).then(res => res.json()),
-                fetch(`${API_URL}/bids`).then(res => res.json())
-            ])
-            .then(([users, categories, tenders, bids]) => {
-                document.getElementById("all_data").innerText = JSON.stringify({ users, categories, tenders, bids }, null, 2);
-            })
-            .catch(err => console.error("Ошибка:", err));
+        // Функция для получения всех тендеров
+        async function fetchTenders() {
+            try {
+                const response = await fetch('http://localhost:5500/tenders');
+                const tenders = await response.json();
+                const tendersList = document.getElementById('tendersList');
+                tendersList.innerHTML = ''; // Очистить список перед добавлением новых данных
+
+                tenders.forEach(tender => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = tender.tender_name;
+                    tendersList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Error fetching tenders:', error);
+                alert('Ошибка при получении тендеров');
+            }
         }
     </script>
+</head>
+<body>
+
+    <h1>API Test</h1>
+
+    <h2>Создать пользователя</h2>
+    <label for="userName">Имя:</label><input type="text" id="userName"><br>
+    <label for="userEmail">Email:</label><input type="email" id="userEmail"><br>
+    <label for="userAddress">Адрес:</label><input type="text" id="userAddress"><br>
+    <label for="userType">Тип пользователя:</label><input type="text" id="userType"><br>
+    <label for="userPassword">Пароль:</label><input type="password" id="userPassword"><br>
+    <button onclick="createUser()">Создать пользователя</button>
+
+    <h2>Список пользователей</h2>
+    <button onclick="fetchUsers()">Получить пользователей</button>
+    <ul id="usersList"></ul>
+
+    <h2>Создать категорию</h2>
+    <label for="categoryName">Название категории:</label><input type="text" id="categoryName"><br>
+    <button onclick="createCategory()">Создать категорию</button>
+
+    <h2>Список категорий</h2>
+    <button onclick="fetchCategories()">Получить категории</button>
+    <ul id="categoriesList"></ul>
+
+    <h2>Создать тендер</h2>
+    <label for="tenderName">Название тендера:</label><input type="text" id="tenderName"><br>
+    <label for="staffId">ID сотрудника:</label><input type="text" id="staffId"><br>
+    <label for="constructionFrom">Дата начала строительства:</label><input type="date" id="constructionFrom"><br>
+    <label for="constructionTo">Дата окончания строительства:</label><input type="date" id="constructionTo"><br>
+    <label for="dateOfTenderNotice">Дата объявления тендера:</label><input type="date" id="dateOfTenderNotice"><br>
+    <label for="dateOfTenderClose">Дата закрытия тендера:</label><input type="date" id="dateOfTenderClose"><br>
+    <label for="dateOfTenderWinner">Дата объявления победителя:</label><input type="date" id="dateOfTenderWinner"><br>
+    <label for="biddingPrice">Начальная цена:</label><input type="number" id="biddingPrice"><br>
+    <label for="tenderStatus">Статус тендера:</label><input type="text" id="tenderStatus"><br>
+    <button onclick="createTender()">Создать тендер</button>
+
+    <h2>Список тендеров</h2>
+    <button onclick="fetchTenders()">Получить тендеры</button>
+    <ul id="tendersList"></ul>
+
 </body>
 </html>

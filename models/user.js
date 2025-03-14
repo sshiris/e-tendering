@@ -1,14 +1,13 @@
 import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema({
-  user_id: { type: String, required: true, unique: true },
   name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
   address: String,
   user_type: String,
-  password: String,
+  password: { type: String, required: true },
   lock: { type: Boolean, default: false },
-  email: String,
-  categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }] // Ссылка на категорию
+  categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }] // Связь с категориями
 });
 
 const User = mongoose.model('User', userSchema);
