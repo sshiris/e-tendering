@@ -1,11 +1,10 @@
 import mongoose from 'mongoose';
 
 const bidSchema = new mongoose.Schema({
-  bidder_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // Ссылка на участника торгов
-  tender_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Tender' }, // Ссылка на тендер
-  bidding_price: Number,
-  is_winner: { type: Boolean, default: false } // Статус победителя
-});
+  bidder_id: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  tender_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Tender', required: true },
+  bidding_price: { type: Number, required: true, min: 0 },
+  is_winner: { type: Boolean, default: false }
+}, { collection: 'BID' });
 
-const Bid = mongoose.model('Bid', bidSchema);
-export default Bid;
+export default mongoose.model('Bid', bidSchema);
