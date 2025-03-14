@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест API e-Tendering</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        input, button { margin: 5px; padding: 8px; }
+        .container { margin-bottom: 20px; padding: 10px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body>
+    <h1>Тест API e-Tendering</h1>
+
+    <div class="container">
+        <h2>Создать пользователя</h2>
+        <input type="text" id="user_name" placeholder="Имя пользователя">
+        <input type="email" id="user_email" placeholder="Email">
+        <button onclick="createUser()">Создать</button>
+        <p id="user_response"></p>
+    </div>
+
+    <div class="container">
+        <h2>Создать категорию</h2>
+        <input type="text" id="category_name" placeholder="Название категории">
+        <button onclick="createCategory()">Создать</button>
+        <p id="category_response"></p>
+    </div>
+
+    <div class="container">
+        <h2>Добавить пользователя в категорию</h2>
+        <input type="text" id="user_id_category" placeholder="ID пользователя">
+        <input type="text" id="category_id_user" placeholder="ID категории">
+        <button onclick="addUserToCategory()">Добавить</button>
+        <p id="user_category_response"></p>
+    </div>
+
+    <div class="container">
+        <h2>Создать тендер</h2>
+        <input type="text" id="tender_name" placeholder="Название тендера">
+        <input type="date" id="construction_from">
+        <input type="date" id="construction_to">
+        <button onclick="createTender()">Создать</button>
+        <p id="tender_response"></p>
+    </div>
+
+    <div class="container">
+        <h2>Сделать ставку</h2>
+        <input type="text" id="bidder_id" placeholder="ID участника">
+        <input type="text" id="tender_id" placeholder="ID тендера">
+        <input type="number" id="bidding_price" placeholder="Цена">
+        <button onclick="createBid()">Сделать ставку</button>
+        <p id="bid_response"></p>
+    </div>
+
+    <div class="container">
+        <h2>Показать все данные</h2>
+        <button onclick="fetchAllData()">Загрузить</button>
+        <pre id="all_data"></pre>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:5500"; // API-сервер
+
+        // Создать пользователя
+        function createUser() {
+            const name = document.getElementById("user_name").value;
+            const email = document.getElementById("user_email").value;
+
+            fetch(`${API_URL}/create_user`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, email })
+            })
+            .then(res => res.json())
+            .then(data => document.getElementById("user_response").innerText = JSON.stringify(data))
+            .catch(err => console.error("Ошибка:", err));
+        }
+
+        // Создать категорию
+        function createCategory() {
+            const category_name = document.getElementById("category_name").value;
+
+            fetch(`${API_URL}/create_category`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ category_name })
+            })
+            .then(res => res.json())
+            .then(data => document.getElementById("category_response").innerText = JSON.stringify(data))
+            .catch(err => console.error("Ошибка:", err));
+        }
+
+        // Добавить пользователя в категорию
+        function addUserToCategory() {
+            const user_id = document.getElementById("user_id_category").value;
+            const category_id = document.getElementById("category_id_user").value;
+
+            fetch(`${API_URL}/add_user_to_category`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ user_id, category_id })
+            })
+            .then(res => res.json())
+            .then(data => document.getElementById("user_category_response").innerText = JSON.stringify(data))
+            .catch(err => console.error("Ошибка:", err));
+        }
+
+        // Создать тендер
+        function createTender() {
+            const tender_name = document.getElementById("tender_name").value;
+            const construction_from = document.getElementById("construction_from").value;
+            const construction_to = document.getElementById("construction_to").value;
+
+            fetch(`${API_URL}/create_tender`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ tender_name, construction_from, construction_to })
+            })
+            .then(res => res.json())
+            .then(data => document.getElementById("tender_response").innerText = JSON.stringify(data))
+            .catch(err => console.error("Ошибка:", err));
+        }
+
+        // Сделать ставку
+        function createBid() {
+            const bidder_id = document.getElementById("bidder_id").value;
+            const tender_id = document.getElementById("tender_id").value;
+            const bidding_price = document.getElementById("bidding_price").value;
+
+            fetch(`${API_URL}/create_bid`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ bidder_id, tender_id, bidding_price })
+            })
+            .then(res => res.json())
+            .then(data => document.getElementById("bid_response").innerText = JSON.stringify(data))
+            .catch(err => console.error("Ошибка:", err));
+        }
+
+        // Получить все данные
+        function fetchAllData() {
+            Promise.all([
+                fetch(`${API_URL}/users`).then(res => res.json()),
+                fetch(`${API_URL}/categories`).then(res => res.json()),
+                fetch(`${API_URL}/tenders`).then(res => res.json()),
+                fetch(`${API_URL}/bids`).then(res => res.json())
+            ])
+            .then(([users, categories, tenders, bids]) => {
+                document.getElementById("all_data").innerText = JSON.stringify({ users, categories, tenders, bids }, null, 2);
+            })
+            .catch(err => console.error("Ошибка:", err));
+        }
+    </script>
+</body>
+</html>
