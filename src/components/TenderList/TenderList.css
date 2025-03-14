@@ -12,3 +12,7 @@ td {
   position: relative;
   top: -15px;
 }
+
+td:hover {
+  cursor: pointer;
+}

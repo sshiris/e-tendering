@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./TenderList.css";
-function TenderList({ tenders, lastId, isAuthenticated }) {
+function TenderList({ tenders, isAuthenticated }) {
   const [filteredTender, setFilteredTender] = useState(tenders);
 
   const handleSearch = (event) => {
@@ -12,6 +12,9 @@ function TenderList({ tenders, lastId, isAuthenticated }) {
     );
   };
 
+  function handleRowClick(tender) {
+    navigate(`/tender/${tender.id}/details`, { state: tender });
+  }
   const navigate = useNavigate();
   return (
     <div>
@@ -38,7 +41,7 @@ function TenderList({ tenders, lastId, isAuthenticated }) {
           {filteredTender.map((tender) => (
             <tr key={tender.id}>
               <td>{tender.id}</td>
-              <td>{tender.name}</td>
+              <td onClick={() => handleRowClick(tender)}>{tender.name}</td>
               <td>{tender.notice}</td>
               <td>{tender.close}</td>
               <td>{tender.disclosingWinner}</td>

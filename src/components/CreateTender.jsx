@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function CreateTender({ addTender, setShowForm, lastId }) {
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().slice(0, 16).replace("T", " ");
 
   const navigate = useNavigate();
   const [newTender, setNewTender] = useState({
     id: lastId + 1,
     name: "",
+    description: "",
     notice: today,
     close: today,
     disclosingWinner: today,
@@ -16,21 +17,15 @@ export default function CreateTender({ addTender, setShowForm, lastId }) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    const tenderToAdd = {
-      id: newTender.id,
-      name: newTender.name,
-      notice: newTender.notice,
-      close: newTender.close,
-      disclosingWinner: newTender.disclosingWinner,
-      status: newTender.status,
-    };
 
-    addTender(tenderToAdd);
+    addTender(newTender);
     setNewTender({
+      id: newTender.id + 1,
       name: "",
-      notice: "",
-      close: "",
-      disclosingWinner: "",
+      description: "",
+      notice: today,
+      close: today,
+      disclosingWinner: today,
       status: "Open",
     });
 
@@ -38,7 +33,6 @@ export default function CreateTender({ addTender, setShowForm, lastId }) {
     setShowForm(false);
     navigate("/tenders");
   }
-
   function handleInputChange(e) {
     const { name, value } = e.target;
     setNewTender((prev) => ({
@@ -46,7 +40,6 @@ export default function CreateTender({ addTender, setShowForm, lastId }) {
       [name]: value,
     }));
   }
-
   return (
     <div>
       <h3>Create New Tender</h3>
@@ -62,9 +55,19 @@ export default function CreateTender({ addTender, setShowForm, lastId }) {
           />
         </div>
         <div>
+          <label>Description:</label>
+          <input
+            type="text"
+            name="description"
+            value={newTender.description}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+        <div>
           <label>Date of Tender Notice:</label>
           <input
-            type="date"
+            type="datetime-local"
             name="notice"
             value={newTender.notice}
             onChange={handleInputChange}
@@ -74,7 +77,7 @@ export default function CreateTender({ addTender, setShowForm, lastId }) {
         <div>
           <label>Date of Tender Close:</label>
           <input
-            type="date"
+            type="datetime-local"
             name="close"
             value={newTender.close}
             onChange={handleInputChange}
@@ -84,7 +87,7 @@ export default function CreateTender({ addTender, setShowForm, lastId }) {
         <div>
           <label>Date of Disclosing Winner:</label>
           <input
-            type="date"
+            type="datetime-local"
             name="disclosingWinner"
             value={newTender.disclosingWinner}
             onChange={handleInputChange}
