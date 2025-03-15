@@ -1,129 +1,59 @@
-import express from 'express';
 import mongoose from 'mongoose';
+import express from 'express';
 import cors from 'cors';
-import User from './models/user.js';
-import Category from './models/category.js';
-import Tender from './models/tender.js';
-import Bid from './models/bid.js';
 
-// Initialize Express
+// Initialize the app and define the port
 const app = express();
 const port = 5500;
 
 // Middleware
-app.use(cors()); // Enable cross-origin requests
-app.use(express.json()); // Parse JSON data
+app.use(cors()); // Allow cross-origin requests
+app.use(express.json()); // Parse JSON bodies
+
+// MongoDB connection string (ensure you replace with your correct credentials)
+const uri = "mongodb+srv://storeDataUser:g1MfHieubCImPSXV@cluster0.noqzo.mongodb.net/e-Tendering?retryWrites=true&w=majority";
 
 // Connect to MongoDB
-const uri = "mongodb+srv://storeDataUser:g1MfHieubCImPSXV@cluster0.noqzo.mongodb.net/e-Tendering?retryWrites=true&w=majority";
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch((err) => console.log('Failed to connect to MongoDB Atlas', err));
 
-// API routes
+// Define the Tender Schema and Model
+const tenderSchema = new mongoose.Schema({
+  tender_id: String,
+  tender_name: String,
+  construction_from: Date,
+  construction_to: Date,
+  date_of_tender_notice: Date,
+  date_of_tender_close: Date,
+  date_of_tender_winner: Date,
+  bidding_price: Number,
+  tender_status: String,
+  staff_id: String
+}, { collection: 'TENDER' }); // Specify the collection name
 
-// Route to create a user
-app.post('/create_user', async (req, res) => {
-    try {
-        const { name, email, categories } = req.body; // categories - array of category IDs
-        const user = new User({ name, email, categories });
-        await user.save();
-        res.json({ message: 'User created successfully', user });
-    } catch (err) {
-        res.status(500).json({ error: 'Error creating user', details: err });
-    }
+const Tender = mongoose.model('Tender', tenderSchema);
+
+// Endpoint to save tender
+app.post('/save_tender', (req, res) => {
+  const { tender_id, tender_name, construction_from, construction_to, date_of_tender_notice, date_of_tender_close, date_of_tender_winner, bidding_price, tender_status, staff_id } = req.body;
+
+  // Check for missing required fields
+  if (!tender_id || !tender_name || !construction_from || !construction_to || !date_of_tender_notice || !date_of_tender_close || !date_of_tender_winner || !bidding_price || !tender_status || !staff_id) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+
+  const tender = new Tender(req.body); // Create new tender from the request body
+  tender.save() // Save the tender document to the database
+    .then(() => res.json({ message: 'Tender saved successfully' })) // Success response
+    .catch((err) => res.status(500).json({ error: 'Error saving tender', details: err })); // Error response
 });
 
-// Route to get all users
-app.get('/users', async (req, res) => {
-  try {
-    const users = await User.find().populate('categories'); // Populate user categories
-    res.json(users);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching users', details: err });
-  }
-});
-
-// Route to create a category
-app.post('/create_category', async (req, res) => {
-  try {
-    const { category_name } = req.body;
-    const category = new Category({ category_name });
-    await category.save();
-    res.json({ message: 'Category created successfully', category });
-  } catch (err) {
-    res.status(500).json({ error: 'Error creating category', details: err });
-  }
-});
-
-// Route to get all categories
-app.get('/categories', async (req, res) => {
-  try {
-    const categories = await Category.find();
-    res.json(categories);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching categories', details: err });
-  }
-});
-
-// Route to create a tender
-app.post('/create_tender', async (req, res) => {
-  try {
-    const { tender_name, staff_id, construction_from, construction_to, date_of_tender_notice, 
-      date_of_tender_close, date_of_tender_winner, bidding_price, tender_status } = req.body;
-    const tender = new Tender({
-      tender_name, 
-      staff_id, 
-      construction_from, 
-      construction_to, 
-      date_of_tender_notice,
-      date_of_tender_close, 
-      date_of_tender_winner, 
-      bidding_price, 
-      tender_status
-    });
-    await tender.save();
-    res.json({ message: 'Tender created successfully', tender });
-  } catch (err) {
-    res.status(500).json({ error: 'Error creating tender', details: err });
-  }
-});
-
-// Route to get all tenders
-app.get('/tenders', async (req, res) => {
-  try {
-    const tenders = await Tender.find().populate('staff_id');
-    res.json(tenders);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching tenders', details: err });
-  }
-});
-
-// Route to create a bid
-app.post('/create_bid', async (req, res) => {
-  try {
-    const { bidder_id, tender_id, bidding_price, is_winner } = req.body;
-    const bid = new Bid({
-      bidder_id, 
-      tender_id, 
-      bidding_price, 
-      is_winner
-    });
-    await bid.save();
-    res.json({ message: 'Bid created successfully', bid });
-  } catch (err) {
-    res.status(500).json({ error: 'Error creating bid', details: err });
-  }
-});
-
-// Route to get all bids
-app.get('/bids', async (req, res) => {
-  try {
-    const bids = await Bid.find().populate('bidder_id').populate('tender_id');
-    res.json(bids);
-  } catch (err) {
-    res.status(500).json({ error: 'Error fetching bids', details: err });
-  }
+// Endpoint to find tenders
+app.get('/find', (req, res) => {
+  Tender.find() // Find all tenders in the TENDER collection
+    .then(tenders => res.json(tenders)) // Return tenders as JSON
+    .catch((err) => res.status(500).json({ error: 'Error fetching tenders', details: err })); // Error response
 });
 
 // Start the server
