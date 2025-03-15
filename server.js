@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import express from 'express';
 import cors from 'cors';
+import User from './models/user.js';
 
 // Initialize the app and define the port
 const app = express();
@@ -53,6 +54,30 @@ app.get('/find', (req, res) => {
       console.error('Error fetching tenders:', err); // Log the error
       res.status(500).json({ error: 'Error fetching tenders', details: err });
     }); // Error response
+});
+
+// Endpoint to create user
+app.post('/create_user', async (req, res) => {
+  try {
+    const { user_id, name, address, user_type, password, email, categories } = req.body;
+    const user = new User({ user_id, name, address, user_type, password, email, categories });
+    await user.save();
+    res.json({ message: 'User created successfully', user });
+  } catch (err) {
+    console.error('Error creating user:', err); // Log the error
+    res.status(500).json({ error: 'Error creating user', details: err.message });
+  }
+});
+
+// Endpoint to get all users
+app.get('/users', async (req, res) => {
+  try {
+    const users = await User.find().populate('categories');
+    res.json(users);
+  } catch (err) {
+    console.error('Error fetching users:', err); // Log the error
+    res.status(500).json({ error: 'Error fetching users', details: err.message });
+  }
 });
 
 // Start the server
