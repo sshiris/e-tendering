@@ -28,6 +28,12 @@ mongoose.connect(uri)
     // process.exit(1); Uncomment if you want the server to stop in production
   });
 
+// Error logging middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
 // Endpoint to save tender
 app.post('/save_tender', (req, res) => {
   const tender = new Tender({ ...req.body, tender_id: 'TND-' + Date.now() }); // Generate new tender ID
@@ -75,6 +81,17 @@ app.get('/users', async (req, res) => {
   } catch (err) {
     console.error('Error fetching users:', err); // Log the error
     res.status(500).json({ error: 'Error fetching users', details: err.message });
+  }
+});
+
+// Endpoint to get distinct user types
+app.get('/user_types', async (req, res) => {
+  try {
+    const userTypes = await User.distinct('user_type');
+    res.json(userTypes);
+  } catch (err) {
+    console.error('Error fetching user types:', err); // Log the error
+    res.status(500).json({ error: 'Error fetching user types', details: err.message });
   }
 });
 
@@ -172,6 +189,76 @@ app.get('/create_collections', async (req, res) => {
   } catch (err) {
     console.error('Error creating collections:', err); // Log the error
     res.status(500).json({ error: 'Error creating collections', details: err.message });
+  }
+});
+
+// Endpoint to create a new category
+app.post('/create_category', async (req, res) => {
+  try {
+    const { category_id, category_name } = req.body;
+    const category = new Category({ category_id, category_name });
+    await category.save();
+    res.json({ message: 'Category created successfully', category });
+  } catch (err) {
+    console.error('Error creating category:', err); // Log the error
+    res.status(500).json({ error: 'Error creating category', details: err.message });
+  }
+});
+
+// Endpoint to get all categories
+app.get('/categories', async (req, res) => {
+  try {
+    const categories = await Category.find().populate('users');
+    res.json(categories);
+  } catch (err) {
+    console.error('Error fetching categories:', err); // Log the error
+    res.status(500).json({ error: 'Error fetching categories', details: err.message });
+  }
+});
+
+// Endpoint to add a user to a category
+app.post('/add_user_to_category', async (req, res) => {
+  try {
+    const { user_id, category_id } = req.body;
+    if (!user_id || !category_id) {
+      return res.status(400).json({ error: 'User ID and Category ID are required' });
+    }
+    const user = await User.findOne({ user_id });
+    const category = await Category.findOne({ category_id });
+    if (!user || !category) {
+      return res.status(400).json({ error: 'Invalid user or category ID' });
+    }
+    user.categories.push(category._id);
+    category.users.push(user._id);
+    await user.save();
+    await category.save();
+    res.json({ message: 'User added to category successfully' });
+  } catch (err) {
+    console.error('Error adding user to category:', err); // Log the error
+    res.status(500).json({ error: 'Error adding user to category', details: err.message });
+  }
+});
+
+// Endpoint to remove a user from a category
+app.post('/remove_user_from_category', async (req, res) => {
+  try {
+    const { user_id, category_id } = req.body;
+    if (!user_id || !category_id) {
+      return res.status(400).json({ error: 'User ID and Category ID are required' });
+    }
+    const user = await User.findOne({ user_id });
+    const category = await Category.findOne({ category_id });
+    if (!user || !category) {
+      return res.status(400).json({ error: 'Invalid user or category ID' });
+    }
+    user.categories.pull(category._id);
+    category.users.pull(user._id);
+    await user.save();
+    await category.save();
+    res.json({ message: 'User removed from category successfully' });
+  } catch (err) {
+    console.error('Error removing user from category:', err); // Log the error
+    res.status(500).json({ error: 'Error removing user from category', details: err.message });
   }
 });
 

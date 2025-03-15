@@ -13,6 +13,15 @@ const userSchema = new mongoose.Schema({
   bids: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BID' }]
 }, { collection: 'USER' });
 
+// Middleware to auto-populate related fields
+userSchema.pre('find', function() {
+  this.populate('categories').populate('tenders').populate('bids');
+});
+
+userSchema.pre('findOne', function() {
+  this.populate('categories').populate('tenders').populate('bids');
+});
+
 const User = mongoose.model('USER', userSchema);
 
 export default User;

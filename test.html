@@ -263,6 +263,72 @@
             })
             .catch(error => console.error("Error:", error));
         }
+        function fetchCategories() {
+            fetch("http://localhost:5500/categories")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(categories => {
+                    const categoryDropdown = document.getElementById("user_category_category_id");
+                    categoryDropdown.innerHTML = ""; // Clear existing options
+                    categories.forEach(category => {
+                        const option = document.createElement("option");
+                        option.value = category.category_id;
+                        option.textContent = category.category_name;
+                        categoryDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error fetching categories:", error));
+        }
+
+        function addUserToCategory() {
+            const user_id = document.getElementById("user_category_user_id").value;
+            const category_id = document.getElementById("user_category_category_id").value;
+
+            fetch("http://localhost:5500/add_user_to_category", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ user_id, category_id })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function removeUserFromCategory() {
+            const user_id = document.getElementById("user_category_user_id").value;
+            const category_id = document.getElementById("user_category_category_id").value;
+
+            fetch("http://localhost:5500/remove_user_from_category", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ user_id, category_id })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => console.error("Error:", error));
+        }
 
         window.onload = function() {
             document.getElementById("tender_id").value = generateTenderID();
@@ -280,6 +346,8 @@
             fetchUsers(); // Fetch and display the list of users on page load
             fetchBids(); // Fetch and display the list of bids on page load
         };
+
+        
     </script>
 </head>
 <body>
@@ -318,12 +386,18 @@
         <tbody id="tendersTable"></tbody>
     </table>
 
+    
+
     <h2>Enter User Details</h2>
     <form onsubmit="event.preventDefault(); saveUser();">
         <label>User ID: <input type="text" id="user_id" readonly></label><br>
         <label>Name: <input type="text" id="user_name" required></label><br>
         <label>Address: <input type="text" id="user_address" required></label><br>
-        <label>User Type: <input type="text" id="user_type" required></label><br>
+        <label>User Type: 
+            <select id="user_type" required>
+                <!-- Options will be populated dynamically -->
+            </select>
+        </label><br>
         <label>Password: <input type="password" id="user_password" required></label><br>
         <label>Email: <input type="email" id="user_email" required></label><br>
         <button type="submit">Save User</button>
