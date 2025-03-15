@@ -76,6 +76,26 @@
                 .catch(error => console.error("Error fetching categories:", error));
         }
 
+        function fetchUserTypes() {
+            fetch("http://localhost:5500/user_types")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(userTypes => {
+                    const userTypesTable = document.getElementById("userTypesTable");
+                    userTypesTable.innerHTML = ""; // Clear the table before adding new items
+                    userTypes.forEach(userType => {
+                        const row = userTypesTable.insertRow();
+                        row.insertCell(0).textContent = userType.type_id;
+                        row.insertCell(1).textContent = userType.type_name;
+                    });
+                })
+                .catch(error => console.error("Error fetching user types:", error));
+        }
+
         function addUserToCategory() {
             const user_id = document.getElementById("add_user_category_user_id").value;
             const category_id = document.getElementById("add_user_category_category_id").value;
@@ -153,9 +173,39 @@
             .catch(error => console.error("Error:", error));
         }
 
+        function saveUserType() {
+            const userTypeData = {
+                type_id: 'UT-' + Date.now(), // Generate a new unique ID for each user type
+                type_name: document.getElementById("user_type_name").value
+            };
+
+            console.log("Saved JSON:", JSON.stringify(userTypeData));
+            alert("User type saved! Check console for JSON output.");
+
+            fetch("http://localhost:5500/create_user_type", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(userTypeData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                fetchUserTypes(); // Refresh the list of user types
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
         window.onload = function() {
             fetchUsers(); // Fetch and display the list of users on page load
             fetchCategories(); // Fetch and display the list of categories on page load
+            fetchUserTypes(); // Fetch and display the list of user types on page load
         };
     </script>
 </head>
@@ -164,6 +214,12 @@
     <form onsubmit="event.preventDefault(); saveCategory();">
         <label>Category Name: <input type="text" id="category_name" required></label><br>
         <button type="submit">Save Category</button>
+    </form>
+
+    <h2>Enter User Type Details</h2>
+    <form onsubmit="event.preventDefault(); saveUserType();">
+        <label>User Type Name: <input type="text" id="user_type_name" required></label><br>
+        <button type="submit">Save User Type</button>
     </form>
 
     <h2>Manage User-Category Relationships</h2>
@@ -205,6 +261,17 @@
             </tr>
         </thead>
         <tbody id="categoriesTable"></tbody>
+    </table>
+
+    <h2>List of User Types</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>User Type ID</th>
+                <th>User Type Name</th>
+            </tr>
+        </thead>
+        <tbody id="userTypesTable"></tbody>
     </table>
 </body>
 </html>

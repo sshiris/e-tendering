@@ -277,6 +277,51 @@ app.post('/remove_user_from_category', async (req, res) => {
   }
 });
 
+// Endpoint to update tender
+app.put('/update_tender/:tender_id', async (req, res) => {
+  try {
+    const { tender_id } = req.params;
+    const updatedTender = await Tender.findOneAndUpdate({ tender_id }, req.body, { new: true });
+    if (!updatedTender) {
+      return res.status(404).json({ error: 'Tender not found' });
+    }
+    res.json({ message: 'Tender updated successfully', updatedTender });
+  } catch (err) {
+    console.error('Error updating tender:', err);
+    res.status(500).json({ error: 'Error updating tender', details: err.message });
+  }
+});
+
+// Endpoint to update user
+app.put('/update_user/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const updatedUser = await User.findOneAndUpdate({ user_id }, req.body, { new: true });
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json({ message: 'User updated successfully', updatedUser });
+  } catch (err) {
+    console.error('Error updating user:', err);
+    res.status(500).json({ error: 'Error updating user', details: err.message });
+  }
+});
+
+// Endpoint to update bid
+app.put('/update_bid/:bid_id', async (req, res) => {
+  try {
+    const { bid_id } = req.params;
+    const updatedBid = await Bid.findOneAndUpdate({ bid_id }, req.body, { new: true });
+    if (!updatedBid) {
+      return res.status(404).json({ error: 'Bid not found' });
+    }
+    res.json({ message: 'Bid updated successfully', updatedBid });
+  } catch (err) {
+    console.error('Error updating bid:', err);
+    res.status(500).json({ error: 'Error updating bid', details: err.message });
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

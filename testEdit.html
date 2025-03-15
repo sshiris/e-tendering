@@ -15,11 +15,11 @@
                         const row = tendersTable.insertRow();
                         row.insertCell(0).textContent = tender.tender_id;
                         row.insertCell(1).textContent = tender.tender_name;
-                        row.insertCell(2).textContent = tender.construction_from;
-                        row.insertCell(3).textContent = tender.construction_to;
-                        row.insertCell(4).textContent = tender.date_of_tender_notice;
-                        row.insertCell(5).textContent = tender.date_of_tender_close;
-                        row.insertCell(6).textContent = tender.date_of_tender_winner;
+                        row.insertCell(2).textContent = tender.construction_from.split('T')[0];
+                        row.insertCell(3).textContent = tender.construction_to.split('T')[0];
+                        row.insertCell(4).textContent = tender.date_of_tender_notice.split('T')[0];
+                        row.insertCell(5).textContent = tender.date_of_tender_close.split('T')[0];
+                        row.insertCell(6).textContent = tender.date_of_tender_winner.split('T')[0];
                         row.insertCell(7).textContent = tender.bidding_price;
                         row.insertCell(8).textContent = tender.tender_status;
                         row.insertCell(9).textContent = tender.staff_id;
@@ -66,7 +66,7 @@
                         const row = bidsTable.insertRow();
                         row.insertCell(0).textContent = bid.bid_id;
                         row.insertCell(1).textContent = bid.amount;
-                        row.insertCell(2).textContent = bid.date;
+                        row.insertCell(2).textContent = bid.date.split('T')[0];
                         row.insertCell(3).textContent = bid.user ? bid.user.name : 'Unknown User';
                         row.insertCell(4).textContent = bid.tender ? bid.tender.tender_name : 'Unknown Tender';
                         const editCell = row.insertCell(5);
@@ -82,11 +82,11 @@
         function editTender(tender) {
             document.getElementById("edit_tender_id").value = tender.tender_id;
             document.getElementById("edit_tender_name").value = tender.tender_name;
-            document.getElementById("edit_construction_from").value = tender.construction_from;
-            document.getElementById("edit_construction_to").value = tender.construction_to;
-            document.getElementById("edit_date_of_tender_notice").value = tender.date_of_tender_notice;
-            document.getElementById("edit_date_of_tender_close").value = tender.date_of_tender_close;
-            document.getElementById("edit_date_of_tender_winner").value = tender.date_of_tender_winner;
+            document.getElementById("edit_construction_from").value = tender.construction_from.split('T')[0];
+            document.getElementById("edit_construction_to").value = tender.construction_to.split('T')[0];
+            document.getElementById("edit_date_of_tender_notice").value = tender.date_of_tender_notice.split('T')[0];
+            document.getElementById("edit_date_of_tender_close").value = tender.date_of_tender_close.split('T')[0];
+            document.getElementById("edit_date_of_tender_winner").value = tender.date_of_tender_winner.split('T')[0];
             document.getElementById("edit_bidding_price").value = tender.bidding_price;
             document.getElementById("edit_tender_status").value = tender.tender_status;
             document.getElementById("edit_staff_id").value = tender.staff_id;
