@@ -61,6 +61,10 @@ app.get('/find', (req, res) => {
 app.post('/create_user', async (req, res) => {
   try {
     const { name, address, user_type, password, email, categories } = req.body;
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ error: 'Email already in use' });
+    }
     const user_id = 'USR-' + Date.now(); // Generate a new unique ID for each user
     const user = new User({ user_id, name, address, user_type, password, email, categories });
     await user.save();
