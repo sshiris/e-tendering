@@ -10,7 +10,9 @@ const tenderSchema = new mongoose.Schema({
   date_of_tender_winner: { type: Date },
   bidding_price: { type: Number, required: true, min: 0 },
   tender_status: { type: String, enum: ['Open', 'Closed', 'Pending'], default: 'Pending' },
-  staff_id: { type: String, required: true }
+  staff_id: { type: String, required: true },
+  winner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+  bids: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Bid' }]
 }, { collection: 'TENDER' });
 
 export default mongoose.model('Tender', tenderSchema);

@@ -143,6 +143,51 @@
                 alert('Ошибка при получении тендеров');
             }
         }
+
+        // Функция для создания ставки
+        async function createBid() {
+            const bidData = {
+                bidder_id: document.getElementById('bidderId').value,
+                tender_id: document.getElementById('tenderId').value,
+                bidding_price: document.getElementById('biddingPriceBid').value,
+                is_winner: document.getElementById('isWinner').checked
+            };
+
+            try {
+                const response = await fetch('http://localhost:5500/create_bid', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(bidData)
+                });
+                const result = await response.json();
+                console.log(result);
+                alert('Ставка создана успешно');
+            } catch (error) {
+                console.error('Error creating bid:', error);
+                alert('Ошибка при создании ставки');
+            }
+        }
+
+        // Функция для получения всех ставок
+        async function fetchBids() {
+            try {
+                const response = await fetch('http://localhost:5500/bids');
+                const bids = await response.json();
+                const bidsList = document.getElementById('bidsList');
+                bidsList.innerHTML = ''; // Очистить список перед добавлением новых данных
+
+                bids.forEach(bid => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `Bidder ID: ${bid.bidder_id}, Tender ID: ${bid.tender_id}, Price: ${bid.bidding_price}, Winner: ${bid.is_winner}`;
+                    bidsList.appendChild(listItem);
+                });
+            } catch (error) {
+                console.error('Error fetching bids:', error);
+                alert('Ошибка при получении ставок');
+            }
+        }
     </script>
 </head>
 <body>
@@ -184,6 +229,17 @@
     <h2>Список тендеров</h2>
     <button onclick="fetchTenders()">Получить тендеры</button>
     <ul id="tendersList"></ul>
+
+    <h2>Создать ставку</h2>
+    <label for="bidderId">ID участника:</label><input type="text" id="bidderId"><br>
+    <label for="tenderId">ID тендера:</label><input type="text" id="tenderId"><br>
+    <label for="biddingPriceBid">Цена:</label><input type="number" id="biddingPriceBid"><br>
+    <label for="isWinner">Победитель:</label><input type="checkbox" id="isWinner"><br>
+    <button onclick="createBid()">Создать ставку</button>
+
+    <h2>Список ставок</h2>
+    <button onclick="fetchBids()">Получить ставки</button>
+    <ul id="bidsList"></ul>
 
 </body>
 </html>
