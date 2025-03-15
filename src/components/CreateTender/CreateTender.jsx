@@ -9,11 +9,12 @@ export default function CreateTender({ addTender, lastId }) {
     id: lastId + 1,
     name: "",
     description: "",
-    term: today,
+    term_start: new Date().toISOString().split("T")[0],
+    term_end: new Date().toISOString().split("T")[0],
     notice: today,
     close: today,
     disclosingWinner: today,
-    status: "Open",
+    status: "",
   });
 
   function handleSubmit(e) {
@@ -24,11 +25,12 @@ export default function CreateTender({ addTender, lastId }) {
       id: newTender.id + 1,
       name: "",
       description: "",
-      term: today,
+      term_start: today,
+      term_end: today,
       notice: today,
       close: today,
       disclosingWinner: today,
-      status: "Open",
+      status: "",
     });
 
     navigate("/tenders");
@@ -41,14 +43,14 @@ export default function CreateTender({ addTender, lastId }) {
       [name]: value,
     }));
   }
-
   return (
     <div>
       <h3>Create New Tender</h3>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Name:</label>
+          <label htmlFor="name">Name:</label>
           <input
+            id="name"
             type="text"
             name="name"
             value={newTender.name}
@@ -57,8 +59,9 @@ export default function CreateTender({ addTender, lastId }) {
           />
         </div>
         <div>
-          <label>Description:</label>
+          <label htmlFor="description">Description:</label>
           <input
+            id="description"
             type="text"
             name="description"
             value={newTender.description}
@@ -67,12 +70,33 @@ export default function CreateTender({ addTender, lastId }) {
           />
         </div>
         <div>
-          <label>Term of Construction:</label>
-          <div className="date-range-container"></div>
+          <label htmlFor="term-start">Term of Construction:</label>
+          <input
+            id="term-start"
+            type="date"
+            name="term-start"
+            value={newTender.term_start}
+            onChange={handleInputChange}
+            required
+          />
+          -
+          <input
+            id="term-end"
+            type="date"
+            name="term-end"
+            value={newTender.term_end}
+            onChange={handleInputChange}
+            required
+          />
         </div>
         <div>
-          <label>Date of Tender Notice:</label>
+          <label htmlFor="price">Estimated tender price:</label>
+          <input id="price" type="number" min="1" step="500" />
+        </div>
+        <div>
+          <label htmlFor="notice">Date of Tender Notice:</label>
           <input
+            id="notice"
             type="datetime-local"
             name="notice"
             value={newTender.notice}
@@ -81,8 +105,9 @@ export default function CreateTender({ addTender, lastId }) {
           />
         </div>
         <div>
-          <label>Date of Tender Close:</label>
+          <label htmlFor="close">Date of Tender Close:</label>
           <input
+            id="close"
             type="datetime-local"
             name="close"
             value={newTender.close}
@@ -91,8 +116,9 @@ export default function CreateTender({ addTender, lastId }) {
           />
         </div>
         <div>
-          <label>Date of Disclosing Winner:</label>
+          <label htmlFor="disclosingWinner">Date of Disclosing Winner:</label>
           <input
+            id="disclosingWinner"
             type="datetime-local"
             name="disclosingWinner"
             value={newTender.disclosingWinner}
@@ -100,8 +126,9 @@ export default function CreateTender({ addTender, lastId }) {
           />
         </div>
         <div>
-          <label>Tender Status:</label>
+          <label htmlFor="status">Tender Status:</label>
           <input
+            id="status"
             type="text"
             name="status"
             value={newTender.status}
@@ -109,7 +136,7 @@ export default function CreateTender({ addTender, lastId }) {
             required
           />
         </div>
-        <div style={{ marginTop: "20px" }}>
+        <div>
           <button type="submit">Submit Tender</button>
           <button type="button" onClick={() => navigate("/tenders")}>
             Cancel
