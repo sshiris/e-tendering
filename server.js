@@ -5,6 +5,7 @@ import User from './models/user.js';
 import Category from './models/category.js';
 import Tender from './models/tender.js';
 import Bid from './models/bid.js';
+import UserType from './models/userType.js'; // Import UserType model
 
 // Initialize the app and define the port
 const app = express();
@@ -87,11 +88,24 @@ app.get('/users', async (req, res) => {
 // Endpoint to get distinct user types
 app.get('/user_types', async (req, res) => {
   try {
-    const userTypes = await User.distinct('user_type');
+    const userTypes = await UserType.find(); // Fetch all user types
     res.json(userTypes);
   } catch (err) {
     console.error('Error fetching user types:', err); // Log the error
     res.status(500).json({ error: 'Error fetching user types', details: err.message });
+  }
+});
+
+// Endpoint to create a new user type
+app.post('/create_user_type', async (req, res) => {
+  try {
+    const { type_id, type_name } = req.body;
+    const userType = new UserType({ type_id, type_name });
+    await userType.save();
+    res.json({ message: 'User type created successfully', userType });
+  } catch (err) {
+    console.error('Error creating user type:', err); // Log the error
+    res.status(500).json({ error: 'Error creating user type', details: err.message });
   }
 });
 
@@ -185,6 +199,7 @@ app.get('/create_collections', async (req, res) => {
     await Category.createCollection();
     await Tender.createCollection();
     await Bid.createCollection();
+    await UserType.createCollection(); // Create UserType collection
     res.json({ message: 'Collections created successfully' });
   } catch (err) {
     console.error('Error creating collections:', err); // Log the error
