@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Categories and User-Category Relationships</title>
+    <script>
+        function fetchUsers() {
+            fetch("http://localhost:5500/users")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(users => {
+                    const userCategoryDropdownAdd = document.getElementById("add_user_category_user_id");
+                    const userCategoryDropdownRemove = document.getElementById("remove_user_category_user_id");
+                    userCategoryDropdownAdd.innerHTML = ""; // Clear existing options
+                    userCategoryDropdownRemove.innerHTML = ""; // Clear existing options
+                    users.forEach(user => {
+                        const optionAdd = document.createElement("option");
+                        optionAdd.value = user.user_id;
+                        optionAdd.textContent = user.name;
+                        userCategoryDropdownAdd.appendChild(optionAdd);
+
+                        const optionRemove = document.createElement("option");
+                        optionRemove.value = user.user_id;
+                        optionRemove.textContent = user.name;
+                        userCategoryDropdownRemove.appendChild(optionRemove);
+                    });
+                })
+                .catch(error => console.error("Error fetching users:", error));
+        }
+
+        function fetchCategories() {
+            fetch("http://localhost:5500/categories")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(categories => {
+                    const categoryDropdownAdd = document.getElementById("add_user_category_category_id");
+                    const categoryDropdownRemove = document.getElementById("remove_user_category_category_id");
+                    categoryDropdownAdd.innerHTML = ""; // Clear existing options
+                    categoryDropdownRemove.innerHTML = ""; // Clear existing options
+                    categories.forEach(category => {
+                        const optionAdd = document.createElement("option");
+                        optionAdd.value = category.category_id;
+                        optionAdd.textContent = category.category_name;
+                        categoryDropdownAdd.appendChild(optionAdd);
+
+                        const optionRemove = document.createElement("option");
+                        optionRemove.value = category.category_id;
+                        optionRemove.textContent = category.category_name;
+                        categoryDropdownRemove.appendChild(optionRemove);
+                    });
+
+                    // Populate categories table
+                    const categoriesTable = document.getElementById("categoriesTable");
+                    categoriesTable.innerHTML = ""; // Clear the table before adding new items
+                    categories.forEach(category => {
+                        const row = categoriesTable.insertRow();
+                        row.insertCell(0).textContent = category.category_id;
+                        row.insertCell(1).textContent = category.category_name;
+                        const usersCell = row.insertCell(2);
+                        category.users.forEach(user => {
+                            const userDiv = document.createElement("div");
+                            userDiv.textContent = user.name;
+                            usersCell.appendChild(userDiv);
+                        });
+                    });
+                })
+                .catch(error => console.error("Error fetching categories:", error));
+        }
+
+        function addUserToCategory() {
+            const user_id = document.getElementById("add_user_category_user_id").value;
+            const category_id = document.getElementById("add_user_category_category_id").value;
+
+            fetch("http://localhost:5500/add_user_to_category", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ user_id, category_id })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                fetchCategories(); // Refresh the list of categories
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function removeUserFromCategory() {
+            const user_id = document.getElementById("remove_user_category_user_id").value;
+            const category_id = document.getElementById("remove_user_category_category_id").value;
+
+            fetch("http://localhost:5500/remove_user_from_category", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ user_id, category_id })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                fetchCategories(); // Refresh the list of categories
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function saveCategory() {
+            const categoryData = {
+                category_id: 'CAT-' + Date.now(), // Generate a new unique ID for each category
+                category_name: document.getElementById("category_name").value
+            };
+
+            console.log("Saved JSON:", JSON.stringify(categoryData));
+            alert("Category saved! Check console for JSON output.");
+
+            fetch("http://localhost:5500/create_category", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(categoryData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                fetchCategories(); // Refresh the list of categories
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        window.onload = function() {
+            fetchUsers(); // Fetch and display the list of users on page load
+            fetchCategories(); // Fetch and display the list of categories on page load
+        };
+    </script>
+</head>
+<body>
+    <h2>Enter Category Details</h2>
+    <form onsubmit="event.preventDefault(); saveCategory();">
+        <label>Category Name: <input type="text" id="category_name" required></label><br>
+        <button type="submit">Save Category</button>
+    </form>
+
+    <h2>Manage User-Category Relationships</h2>
+    <form onsubmit="event.preventDefault(); addUserToCategory();">
+        <label>User ID: 
+            <select id="add_user_category_user_id" required>
+                <!-- Options will be populated dynamically -->
+            </select>
+        </label><br>
+        <label>Category ID: 
+            <select id="add_user_category_category_id" required>
+                <!-- Options will be populated dynamically -->
+            </select>
+        </label><br>
+        <button type="submit">Add User to Category</button>
+    </form>
+
+    <form onsubmit="event.preventDefault(); removeUserFromCategory();">
+        <label>User ID: 
+            <select id="remove_user_category_user_id" required>
+                <!-- Options will be populated dynamically -->
+            </select>
+        </label><br>
+        <label>Category ID: 
+            <select id="remove_user_category_category_id" required>
+                <!-- Options will be populated dynamically -->
+            </select>
+        </label><br>
+        <button type="submit">Remove User from Category</button>
+    </form>
+
+    <h2>List of Categories</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Category ID</th>
+                <th>Category Name</th>
+                <th>Users</th>
+            </tr>
+        </thead>
+        <tbody id="categoriesTable"></tbody>
+    </table>
+</body>
+</html>
