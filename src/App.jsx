@@ -8,8 +8,8 @@ import {
 import Navbar from "./components/Navbar";
 import Login from "./components/Login/Login";
 import TenderList from "./components/TenderList/TenderList";
-import CreateTender from "./components/CreateTender";
-import DetailedTenderInfo from "./components/DetailedTenderInfo";
+import CreateTender from "./components/CreateTender/CreateTender";
+import DetailedInfo from "./components/DetailedInfo/DetailedInfo";
 import SubmitBid from "./components/SubmitBid";
 import "./App.css";
 
@@ -18,8 +18,6 @@ function App() {
   const [user, setUser] = useState([]);
   const [tenders, setTenders] = useState([]);
   const [bids, setBids] = useState([]);
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [showForm, setShowForm] = useState(false);
   const [lastId, setLastId] = useState(0);
 
   const handleLogin = (email, password) => {
@@ -74,11 +72,7 @@ function App() {
             path="/create-tender"
             element={
               isAuthenticated ? (
-                <CreateTender
-                  addTender={addTender}
-                  setShowForm={setShowForm}
-                  lastId={lastId}
-                />
+                <CreateTender addTender={addTender} lastId={lastId} />
               ) : (
                 <Navigate to="/login" />
               )
@@ -87,14 +81,10 @@ function App() {
           <Route
             path="/tender/:id/details"
             element={
-              isAuthenticated ? (
-                <DetailedTenderInfo
-                  tenders={tenders}
-                  isAuthenticated={isAuthenticated}
-                />
-              ) : (
-                <Navigate to="/login" />
-              )
+              <DetailedInfo
+                tenders={tenders}
+                isAuthenticated={isAuthenticated}
+              />
             }
           />
           <Route

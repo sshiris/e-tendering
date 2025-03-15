@@ -13,7 +13,7 @@ function TenderList({ tenders, isAuthenticated }) {
   };
 
   function handleRowClick(tender) {
-    navigate(`/tender/${tender.id}/details`, { state: tender });
+    navigate(`/tender/${tender.id}/details`);
   }
   const navigate = useNavigate();
   return (
@@ -41,7 +41,14 @@ function TenderList({ tenders, isAuthenticated }) {
           {filteredTender.map((tender) => (
             <tr key={tender.id}>
               <td>{tender.id}</td>
-              <td onClick={() => handleRowClick(tender)}>{tender.name}</td>
+              <td>
+                <span
+                  onClick={() => handleRowClick(tender)}
+                  className="click-to-detail"
+                >
+                  {tender.name}
+                </span>
+              </td>
               <td>{tender.notice}</td>
               <td>{tender.close}</td>
               <td>{tender.disclosingWinner}</td>

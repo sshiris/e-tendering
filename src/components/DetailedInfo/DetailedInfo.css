@@ -1,0 +1,43 @@
+.tender-detail {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+}
+
+.tender-card {
+  background-color: #f1f1f1;
+  border: 10px solid #2a1818;
+  padding: 20px;
+  border-radius: 20px;
+}
+
+.status {
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.detail-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+  justify-content: center;
+}
+
+.detail-row p {
+  margin-right: 30px;
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: end;
+}
+
+.not-found {
+  text-align: center;
+  padding: 30px;
+}

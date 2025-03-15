@@ -4,10 +4,6 @@
   padding: 2rem;
   text-align: center;
 }
-* {
-  background-color: rgb(105, 152, 193);
-  color: #000000aa;
-}
 
 .card {
   padding: 2em;
@@ -22,6 +18,10 @@ input {
 }
 
 button {
-  background-color: rgb(197, 163, 119);
+  padding: 8px 15px;
+  background: #63262c;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
   margin: 10px;
 }
