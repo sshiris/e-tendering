@@ -39,8 +39,34 @@
                 }
                 return response.json();
             })
-            .then(data => alert(data.message))
+            .then(data => {
+                alert(data.message);
+                fetchTenders(); // Refresh the list of tenders
+            })
             .catch(error => console.error("Error:", error));
+        }
+
+        function fetchTenders() {
+            fetch("http://localhost:5500/find")
+                .then(response => response.json())
+                .then(tenders => {
+                    const tendersTable = document.getElementById("tendersTable");
+                    tendersTable.innerHTML = ""; // Clear the table before adding new items
+                    tenders.forEach(tender => {
+                        const row = tendersTable.insertRow();
+                        row.insertCell(0).textContent = tender.tender_id;
+                        row.insertCell(1).textContent = tender.tender_name;
+                        row.insertCell(2).textContent = tender.construction_from;
+                        row.insertCell(3).textContent = tender.construction_to;
+                        row.insertCell(4).textContent = tender.date_of_tender_notice;
+                        row.insertCell(5).textContent = tender.date_of_tender_close;
+                        row.insertCell(6).textContent = tender.date_of_tender_winner;
+                        row.insertCell(7).textContent = tender.bidding_price;
+                        row.insertCell(8).textContent = tender.tender_status;
+                        row.insertCell(9).textContent = tender.staff_id;
+                    });
+                })
+                .catch(error => console.error("Error fetching tenders:", error));
         }
 
         window.onload = function() {
@@ -54,6 +80,7 @@
             document.getElementById("bidding_price").value = "5000000";
             document.getElementById("tender_status").value = "Open";
             document.getElementById("staff_id").value = "STF-12345";
+            fetchTenders(); // Fetch and display the list of tenders on page load
         };
     </script>
 </head>
@@ -72,5 +99,24 @@
         <label>Staff ID: <input type="text" id="staff_id" required></label><br>
         <button type="submit">Save Tender</button>
     </form>
+
+    <h2>List of Tenders</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Tender ID</th>
+                <th>Tender Name</th>
+                <th>Construction From</th>
+                <th>Construction To</th>
+                <th>Date of Tender Notice</th>
+                <th>Date of Tender Close</th>
+                <th>Date of Tender Winner</th>
+                <th>Bidding Price</th>
+                <th>Tender Status</th>
+                <th>Staff ID</th>
+            </tr>
+        </thead>
+        <tbody id="tendersTable"></tbody>
+    </table>
 </body>
 </html>
