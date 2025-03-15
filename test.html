@@ -70,6 +70,16 @@
                         deleteButton.onclick = () => deleteTender(tender.tender_id);
                         deleteCell.appendChild(deleteButton);
                     });
+
+                    // Populate Tender ID dropdown
+                    const tenderDropdown = document.getElementById("bid_tender_id");
+                    tenderDropdown.innerHTML = ""; // Clear existing options
+                    tenders.forEach(tender => {
+                        const option = document.createElement("option");
+                        option.value = tender.tender_id;
+                        option.textContent = tender.tender_name;
+                        tenderDropdown.appendChild(option);
+                    });
                 })
                 .catch(error => console.error("Error fetching tenders:", error));
         }
@@ -153,6 +163,16 @@
                         deleteButton.onclick = () => deleteUser(user.user_id);
                         deleteCell.appendChild(deleteButton);
                     });
+
+                    // Populate User ID dropdown
+                    const userDropdown = document.getElementById("bid_user_id");
+                    userDropdown.innerHTML = ""; // Clear existing options
+                    users.forEach(user => {
+                        const option = document.createElement("option");
+                        option.value = user.user_id;
+                        option.textContent = user.name;
+                        userDropdown.appendChild(option);
+                    });
                 })
                 .catch(error => console.error("Error fetching users:", error));
         }
@@ -174,6 +194,76 @@
             .catch(error => console.error("Error:", error));
         }
 
+        function saveBid() {
+            const bidData = {
+                amount: document.getElementById("bid_amount").value,
+                user_id: document.getElementById("bid_user_id").value,
+                tender_id: document.getElementById("bid_tender_id").value
+            };
+
+            console.log("Saved JSON:", JSON.stringify(bidData));
+            alert("Bid saved! Check console for JSON output.");
+
+            fetch("http://localhost:5500/create_bid", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(bidData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                fetchBids(); // Refresh the list of bids
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function fetchBids() {
+            fetch("http://localhost:5500/bids")
+                .then(response => response.json())
+                .then(bids => {
+                    const bidsTable = document.getElementById("bidsTable");
+                    bidsTable.innerHTML = ""; // Clear the table before adding new items
+                    bids.forEach(bid => {
+                        const row = bidsTable.insertRow();
+                        row.insertCell(0).textContent = bid.bid_id;
+                        row.insertCell(1).textContent = bid.amount;
+                        row.insertCell(2).textContent = bid.date;
+                        row.insertCell(3).textContent = bid.user ? bid.user.name : 'Unknown User';
+                        row.insertCell(4).textContent = bid.tender ? bid.tender.tender_name : 'Unknown Tender';
+                        const deleteCell = row.insertCell(5);
+                        const deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Delete";
+                        deleteButton.onclick = () => deleteBid(bid.bid_id);
+                        deleteCell.appendChild(deleteButton);
+                    });
+                })
+                .catch(error => console.error("Error fetching bids:", error));
+        }
+
+        function deleteBid(bidId) {
+            fetch(`http://localhost:5500/delete_bid/${bidId}`, {
+                method: "DELETE"
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                fetchBids(); // Refresh the list of bids
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
         window.onload = function() {
             document.getElementById("tender_id").value = generateTenderID();
             document.getElementById("tender_name").value = "Road Construction Project";
@@ -188,6 +278,7 @@
             document.getElementById("user_id").value = generateUserID();
             fetchTenders(); // Fetch and display the list of tenders on page load
             fetchUsers(); // Fetch and display the list of users on page load
+            fetchBids(); // Fetch and display the list of bids on page load
         };
     </script>
 </head>
@@ -251,6 +342,37 @@
             </tr>
         </thead>
         <tbody id="usersTable"></tbody>
+    </table>
+
+    <h2>Enter Bid Details</h2>
+    <form onsubmit="event.preventDefault(); saveBid();">
+        <label>Bid Amount: <input type="number" id="bid_amount" required></label><br>
+        <label>User ID: 
+            <select id="bid_user_id" required>
+                <!-- Options will be populated dynamically -->
+            </select>
+        </label><br>
+        <label>Tender ID: 
+            <select id="bid_tender_id" required>
+                <!-- Options will be populated dynamically -->
+            </select>
+        </label><br>
+        <button type="submit">Save Bid</button>
+    </form>
+
+    <h2>List of Bids</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Bid ID</th>
+                <th>Amount</th>
+                <th>Date</th>
+                <th>User</th>
+                <th>Tender</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="bidsTable"></tbody>
     </table>
 </body>
 </html>

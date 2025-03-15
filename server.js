@@ -3,6 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import User from './models/user.js';
 import Category from './models/category.js';
+import Tender from './models/tender.js';
+import Bid from './models/bid.js';
 
 // Initialize the app and define the port
 const app = express();
@@ -25,22 +27,6 @@ mongoose.connect(uri)
     // Decide whether to terminate the process or continue for further debugging
     // process.exit(1); Uncomment if you want the server to stop in production
   });
-
-// Define the Tender Schema and Model
-const tenderSchema = new mongoose.Schema({
-  tender_id: { type: String, required: true, unique: true },
-  tender_name: String,
-  construction_from: Date,
-  construction_to: Date,
-  date_of_tender_notice: Date,
-  date_of_tender_close: Date,
-  date_of_tender_winner: Date,
-  bidding_price: Number,
-  tender_status: String,
-  staff_id: String
-}, { collection: 'TENDER' }); // Specify the collection name
-
-const Tender = mongoose.model('TENDER', tenderSchema);
 
 // Endpoint to save tender
 app.post('/save_tender', (req, res) => {
@@ -116,6 +102,53 @@ app.delete('/delete_tender/:tender_id', async (req, res) => {
   }
 });
 
+// Endpoint to delete bid
+app.delete('/delete_bid/:bid_id', async (req, res) => {
+  try {
+    const { bid_id } = req.params;
+    await Bid.findOneAndDelete({ bid_id });
+    res.json({ message: 'Bid deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting bid:', err); // Log the error
+    res.status(500).json({ error: 'Error deleting bid', details: err.message });
+  }
+});
+
+// Endpoint to create bid
+app.post('/create_bid', async (req, res) => {
+  try {
+    const { amount, user_id, tender_id } = req.body;
+    const user = await User.findOne({ user_id });
+    const tender = await Tender.findOne({ tender_id });
+    if (!user || !tender) {
+      return res.status(400).json({ error: 'Invalid user or tender ID' });
+    }
+    const bid_id = 'BID-' + Date.now(); // Generate a new unique ID for each bid
+    const bid = new Bid({ 
+      bid_id, 
+      amount, 
+      user: user._id, // Use ObjectId
+      tender: tender._id // Use ObjectId
+    });
+    await bid.save();
+    res.json({ message: 'Bid created successfully', bid });
+  } catch (err) {
+    console.error('Error creating bid:', err); // Log the error
+    res.status(500).json({ error: 'Error creating bid', details: err.message });
+  }
+});
+
+// Endpoint to get all bids
+app.get('/bids', async (req, res) => {
+  try {
+    const bids = await Bid.find().populate('user').populate('tender');
+    res.json(bids);
+  } catch (err) {
+    console.error('Error fetching bids:', err); // Log the error
+    res.status(500).json({ error: 'Error fetching bids', details: err.message });
+  }
+});
+
 // Endpoint to check connection to collections
 app.get('/check_connection', async (req, res) => {
   try {
@@ -134,6 +167,7 @@ app.get('/create_collections', async (req, res) => {
     await User.createCollection();
     await Category.createCollection();
     await Tender.createCollection();
+    await Bid.createCollection();
     res.json({ message: 'Collections created successfully' });
   } catch (err) {
     console.error('Error creating collections:', err); // Log the error
