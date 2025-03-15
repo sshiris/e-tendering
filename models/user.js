@@ -8,11 +8,11 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   lock: { type: Boolean, default: false },
   email: { type: String, required: true, unique: true },
-  categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
-  tenders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tender' }],
-  bids: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Bid' }]
+  categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'CATEGORY' }],
+  tenders: [{ type: mongoose.Schema.Types.ObjectId, ref: 'TENDER' }],
+  bids: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BID' }]
 }, { collection: 'USER' });
 
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model('USER', userSchema);
 
 export default User;

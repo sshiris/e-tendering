@@ -69,6 +69,89 @@
                 .catch(error => console.error("Error fetching tenders:", error));
         }
 
+        function generateUserID() {
+            return 'USR-' + Date.now();
+        }
+
+        function saveUser() {
+            const userData = {
+                user_id: generateUserID(), // Generate a new unique ID for each submission
+                name: document.getElementById("user_name").value,
+                address: document.getElementById("user_address").value,
+                user_type: document.getElementById("user_type").value,
+                password: document.getElementById("user_password").value,
+                email: document.getElementById("user_email").value,
+                categories: [] // Add category IDs if necessary
+            };
+
+            console.log("Saved JSON:", JSON.stringify(userData));
+            alert("User saved! Check console for JSON output.");
+
+            fetch("http://localhost:5500/create_user", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(userData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                fetchUsers(); // Refresh the list of users
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
+        function fetchUsers() {
+            fetch("http://localhost:5500/users")
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(users => {
+                    const usersTable = document.getElementById("usersTable");
+                    usersTable.innerHTML = ""; // Clear the table before adding new items
+                    users.forEach(user => {
+                        const row = usersTable.insertRow();
+                        row.insertCell(0).textContent = user.user_id;
+                        row.insertCell(1).textContent = user.name;
+                        row.insertCell(2).textContent = user.address;
+                        row.insertCell(3).textContent = user.user_type;
+                        row.insertCell(4).textContent = user.email;
+                        const deleteCell = row.insertCell(5);
+                        const deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Delete";
+                        deleteButton.onclick = () => deleteUser(user.user_id);
+                        deleteCell.appendChild(deleteButton);
+                    });
+                })
+                .catch(error => console.error("Error fetching users:", error));
+        }
+
+        function deleteUser(userId) {
+            fetch(`http://localhost:5500/delete_user/${userId}`, {
+                method: "DELETE"
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+                fetchUsers(); // Refresh the list of users
+            })
+            .catch(error => console.error("Error:", error));
+        }
+
         window.onload = function() {
             document.getElementById("tender_id").value = generateTenderID();
             document.getElementById("tender_name").value = "Road Construction Project";
@@ -80,7 +163,9 @@
             document.getElementById("bidding_price").value = "5000000";
             document.getElementById("tender_status").value = "Open";
             document.getElementById("staff_id").value = "STF-12345";
+            document.getElementById("user_id").value = generateUserID();
             fetchTenders(); // Fetch and display the list of tenders on page load
+            fetchUsers(); // Fetch and display the list of users on page load
         };
     </script>
 </head>
@@ -117,6 +202,32 @@
             </tr>
         </thead>
         <tbody id="tendersTable"></tbody>
+    </table>
+
+    <h2>Enter User Details</h2>
+    <form onsubmit="event.preventDefault(); saveUser();">
+        <label>User ID: <input type="text" id="user_id" readonly></label><br>
+        <label>Name: <input type="text" id="user_name" required></label><br>
+        <label>Address: <input type="text" id="user_address" required></label><br>
+        <label>User Type: <input type="text" id="user_type" required></label><br>
+        <label>Password: <input type="password" id="user_password" required></label><br>
+        <label>Email: <input type="email" id="user_email" required></label><br>
+        <button type="submit">Save User</button>
+    </form>
+
+    <h2>List of Users</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>User Type</th>
+                <th>Email</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="usersTable"></tbody>
     </table>
 </body>
 </html>
