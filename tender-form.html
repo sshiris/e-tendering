@@ -4,56 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tender Form</title>
-    <script>
-        function generateTenderID() {
-            return 'TND-' + Date.now();
-        }
-
-        function saveTender() {
-            const tenderData = {
-                tender_id: document.getElementById("tender_id").value,
-                tender_name: document.getElementById("tender_name").value,
-                construction_from: document.getElementById("construction_from").value,
-                construction_to: document.getElementById("construction_to").value,
-                date_of_tender_notice: document.getElementById("date_of_tender_notice").value,
-                date_of_tender_close: document.getElementById("date_of_tender_close").value,
-                date_of_tender_winner: document.getElementById("date_of_tender_winner").value,
-                bidding_price: document.getElementById("bidding_price").value,
-                tender_status: document.getElementById("tender_status").value,
-                staff_id: document.getElementById("staff_id").value
-            };
-
-            fetch("http://localhost:5500/save_tender", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(tenderData)
-            })
-            .then(response => response.json())
-            .then(data => alert(data.message))
-            .catch(error => console.error("Error:", error));
-        }
-
-        window.onload = function() {
-            document.getElementById("tender_id").value = generateTenderID();
-        };
-    </script>
 </head>
 <body>
-    <h2>Enter Tender Details</h2>
-    <form onsubmit="event.preventDefault(); saveTender();">
-        <label>Tender ID: <input type="text" id="tender_id" readonly></label><br>
-        <label>Tender Name: <input type="text" id="tender_name" required></label><br>
-        <label>Construction From: <input type="date" id="construction_from" required></label><br>
-        <label>Construction To: <input type="date" id="construction_to" required></label><br>
-        <label>Date of Tender Notice: <input type="date" id="date_of_tender_notice" required></label><br>
-        <label>Date of Tender Close: <input type="date" id="date_of_tender_close" required></label><br>
-        <label>Date of Tender Winner: <input type="date" id="date_of_tender_winner"></label><br>
-        <label>Bidding Price: <input type="number" id="bidding_price" required></label><br>
-        <label>Tender Status: <input type="text" id="tender_status" required></label><br>
-        <label>Staff ID: <input type="text" id="staff_id" required></label><br>
-        <button type="submit">Save Tender</button>
-    </form>
 </body>
 </html>
