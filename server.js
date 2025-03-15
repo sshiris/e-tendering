@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import express from 'express';
 import cors from 'cors';
 import User from './models/user.js';
+import Category from './models/category.js';
 
 // Initialize the app and define the port
 const app = express();
@@ -40,14 +41,45 @@ const tenderSchema = new mongoose.Schema({
   staff_id: { type: String, required: true }
 }, { collection: 'TENDER' });
 
-const Tender = mongoose.model('Tender', tenderSchema);
+const Tender = mongoose.model('TENDER', tenderSchema);
 
 // Endpoint to save tender
+<<<<<<< HEAD
 app.post('/save_tender', async (req, res) => {
   try {
     const tender = new Tender(req.body); // Create a new tender instance
     await tender.save(); // Save the tender document
     res.json({ message: 'Tender saved successfully', tender }); // Return success response
+=======
+app.post('/save_tender', (req, res) => {
+  const tender = new Tender({ ...req.body, tender_id: 'TND-' + Date.now() }); // Generate new tender ID
+  tender.save() // Save the tender document to the database
+    .then(() => res.json({ message: 'Tender saved successfully' })) // Success response
+    .catch((err) => {
+      console.error('Error saving tender:', err); // Log the error
+      res.status(500).json({ error: 'Error saving tender', details: err });
+    }); // Error response
+});
+
+// Endpoint to find tenders
+app.get('/find', (req, res) => {
+  Tender.find() // Find all tenders in the TENDER collection
+    .then(tenders => res.json(tenders)) // Return tenders as JSON
+    .catch((err) => {
+      console.error('Error fetching tenders:', err); // Log the error
+      res.status(500).json({ error: 'Error fetching tenders', details: err });
+    }); // Error response
+});
+
+// Endpoint to create user
+app.post('/create_user', async (req, res) => {
+  try {
+    const { name, address, user_type, password, email, categories } = req.body;
+    const user_id = 'USR-' + Date.now(); // Generate a new unique ID for each user
+    const user = new User({ user_id, name, address, user_type, password, email, categories });
+    await user.save();
+    res.json({ message: 'User created successfully', user });
+>>>>>>> 6f48153e7bfd85dc5b39e8568515d70ba14620ca
   } catch (err) {
     console.error('Error saving tender:', err.message); // Log the error
     res.status(500).json({ error: 'Error saving tender', details: err.message }); // Return error response
@@ -93,6 +125,43 @@ app.get('/users', async (req, res) => {
   } catch (err) {
     console.error('Error fetching users:', err.message); // Log the error
     res.status(500).json({ error: 'Error fetching users', details: err.message }); // Return error response
+  }
+});
+
+// Endpoint to delete user
+app.delete('/delete_user/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    await User.findOneAndDelete({ user_id });
+    res.json({ message: 'User deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting user:', err); // Log the error
+    res.status(500).json({ error: 'Error deleting user', details: err.message });
+  }
+});
+
+// Endpoint to check connection to collections
+app.get('/check_connection', async (req, res) => {
+  try {
+    const userCount = await User.countDocuments();
+    const categoryCount = await Category.countDocuments();
+    res.json({ message: 'Connection successful', userCount, categoryCount });
+  } catch (err) {
+    console.error('Error checking connection:', err); // Log the error
+    res.status(500).json({ error: 'Error checking connection', details: err.message });
+  }
+});
+
+// Endpoint to create collections
+app.get('/create_collections', async (req, res) => {
+  try {
+    await User.createCollection();
+    await Category.createCollection();
+    await Tender.createCollection();
+    res.json({ message: 'Collections created successfully' });
+  } catch (err) {
+    console.error('Error creating collections:', err); // Log the error
+    res.status(500).json({ error: 'Error creating collections', details: err.message });
   }
 });
 
