@@ -44,7 +44,7 @@
                         row.insertCell(0).textContent = user.user_id;
                         row.insertCell(1).textContent = user.name;
                         row.insertCell(2).textContent = user.address;
-                        row.insertCell(3).textContent = user.user_type;
+                        row.insertCell(3).textContent = user.user_type ? user.user_type.type_name : 'Unknown'; // Display user type name
                         row.insertCell(4).textContent = user.email;
                         const editCell = row.insertCell(5);
                         const editButton = document.createElement("button");
@@ -130,7 +130,7 @@
             document.getElementById("edit_user_id").value = user.user_id;
             document.getElementById("edit_user_name").value = user.name;
             document.getElementById("edit_user_address").value = user.address;
-            document.getElementById("edit_user_type").value = user.user_type;
+            document.getElementById("edit_user_type").value = user.user_type ? user.user_type._id : '';
             document.getElementById("edit_user_password").value = user.password;
             document.getElementById("edit_user_email").value = user.email;
         }
@@ -204,6 +204,7 @@
             fetchTenders(); // Fetch and display the list of tenders on page load
             fetchUsers(); // Fetch and display the list of users on page load
             fetchBids(); // Fetch and display the list of bids on page load
+            
         };
     </script>
 </head>

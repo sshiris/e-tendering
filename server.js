@@ -77,7 +77,7 @@ app.post('/create_user', async (req, res) => {
 // Endpoint to get all users
 app.get('/users', async (req, res) => {
   try {
-    const users = await User.find().populate('categories');
+    const users = await User.find().populate('categories').populate('user_type');
     res.json(users);
   } catch (err) {
     console.error('Error fetching users:', err); // Log the error
