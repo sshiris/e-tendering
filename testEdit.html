@@ -12,7 +12,7 @@
                     const tendersTable = document.getElementById("tendersTable");
                     tendersTable.innerHTML = ""; // Clear the table before adding new items
                     tenders.forEach(tender => {
-                        const row = tendersTable.insertRow();
+                        const row = tendersTable.insertRow();//insertRow() method creates a new row in a table and returns a reference to the newly created row.
                         row.insertCell(0).textContent = tender.tender_id;
                         row.insertCell(1).textContent = tender.tender_name;
                         row.insertCell(2).textContent = tender.construction_from.split('T')[0];
@@ -82,6 +82,7 @@
         function editTender(tender) {
             document.getElementById("edit_tender_id").value = tender.tender_id;
             document.getElementById("edit_tender_name").value = tender.tender_name;
+            document.getElementById("edit_tender_description").value = tender.description; // add description
             document.getElementById("edit_construction_from").value = tender.construction_from.split('T')[0];
             document.getElementById("edit_construction_to").value = tender.construction_to.split('T')[0];
             document.getElementById("edit_date_of_tender_notice").value = tender.date_of_tender_notice.split('T')[0];
@@ -96,6 +97,7 @@
             const tenderData = {
                 tender_id: document.getElementById("edit_tender_id").value,
                 tender_name: document.getElementById("edit_tender_name").value,
+                description: document.getElementById("edit_tender_description").value, // add description
                 construction_from: document.getElementById("edit_construction_from").value,
                 construction_to: document.getElementById("edit_construction_to").value,
                 date_of_tender_notice: document.getElementById("edit_date_of_tender_notice").value,
@@ -213,6 +215,7 @@
     <form onsubmit="event.preventDefault(); saveEditedTender();">
         <label>Tender ID: <input type="text" id="edit_tender_id" readonly></label><br>
         <label>Tender Name: <input type="text" id="edit_tender_name" required></label><br>
+        <label>Description: <input type="text" id="edit_tender_description" required></label><br> <!-- add description -->
         <label>Construction From: <input type="date" id="edit_construction_from" required></label><br>
         <label>Construction To: <input type="date" id="edit_construction_to" required></label><br>
         <label>Date of Tender Notice: <input type="date" id="edit_date_of_tender_notice" required></label><br>
@@ -230,6 +233,7 @@
             <tr>
                 <th>Tender ID</th>
                 <th>Tender Name</th>
+                <th>Description</th> <!-- add description -->
                 <th>Construction From</th>
                 <th>Construction To</th>
                 <th>Date of Tender Notice</th>
