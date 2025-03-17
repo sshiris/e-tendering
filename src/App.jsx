@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Login from "./components/Login/Login";
 import TenderList from "./components/TenderList/TenderList";
@@ -11,31 +16,58 @@ import "./App.css";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null); // Change to null for single user
+  const [user, setUser] = useState(null);
   const [tenders, setTenders] = useState([]);
   const [bids, setBids] = useState([]);
   const API_URL = "http://localhost:5500";
 
-  // Fetch tenders on mount
   useEffect(() => {
-    axios
-      .get(`${API_URL}/find`)
-      .then((response) => setTenders(response.data))
-      .catch((error) => console.error("Error fetching tenders:", error));
+    fetchTenders();
+    fetchBids();
   }, []);
 
-  // Login function with backend integration
+  const fetchTenders = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/find`);
+      setTenders(response.data);
+    } catch (error) {
+      console.error("Error fetching tenders:", error);
+    }
+  };
+
+  const fetchBids = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/bids`);
+      setBids(response.data);
+    } catch (error) {
+      console.error("Error fetching bids:", error);
+    }
+  };
+
   const handleLogin = async (email, password) => {
     try {
-      // Assuming you add a /login endpoint in backend
-      const response = await axios.post(`${API_URL}/login`, { email, password });
-      if (response.data.success) {
-        setIsAuthenticated(true);
-        setUser(response.data.user);
+      const response = await axios.get(`${API_URL}/users`);
+      const users = response.data;
+
+      const user = users.find(
+        (u) => u.email === email && u.password === password
+      );
+
+      if (!user) {
+        throw new Error("Invalid credentials");
       }
+      setIsAuthenticated(true);
+      setUser({
+        user_id: user.user_id,
+        name: user.name,
+        email: user.email,
+        address: user.address,
+        user_type: user.user_type,
+      });
+      return true;
     } catch (error) {
       console.error("Login failed:", error);
-      alert("Invalid credentials");
+      throw error;
     }
   };
 
@@ -44,28 +76,19 @@ function App() {
     setUser(null);
   };
 
-  // Submit bid to backend
-  const submitBid = async (tenderId, amount) => {
-    if (!user) return alert("Please login first");
-    try {
-      const response = await axios.post(`${API_URL}/create_bid`, {
-        amount,
-        user_id: user.user_id,
-        tender_id: tenderId,
-      });
-      setBids([...bids, response.data.bid]);
-    } catch (error) {
-      console.error("Error submitting bid:", error);
-    }
-  };
-
-  // Add tender to backend
   const addTender = async (newTender) => {
     try {
-      const response = await axios.post(`${API_URL}/save_tender`, newTender);
-      setTenders([...tenders, response.data.tender || { ...newTender, tender_id: response.data.message.split(' ')[2] }]);
+      const response = await axios.post(`${API_URL}/save_tender`, {
+        ...newTender,
+      });
+
+      setTenders([...tenders, response.data.tender || newTender]);
+      fetchTenders();
+
+      return response.data;
     } catch (error) {
       console.error("Error adding tender:", error);
+      throw error;
     }
   };
 
@@ -76,15 +99,17 @@ function App() {
         <Routes>
           <Route
             path="/"
-            element={<TenderList tenders={tenders} isAuthenticated={isAuthenticated} />}
+            element={
+              <TenderList tenders={tenders} isAuthenticated={isAuthenticated} />
+            }
           />
           <Route
             path="/login"
             element={
-              !isAuthenticated ? (
-                <Login handleLogin={handleLogin} />
-              ) : (
+              isAuthenticated ? (
                 <Navigate to="/" />
+              ) : (
+                <Login handleLogin={handleLogin} />
               )
             }
           />
@@ -100,13 +125,20 @@ function App() {
           />
           <Route
             path="/tender/:id/details"
-            element={<DetailedInfo tenders={tenders} isAuthenticated={isAuthenticated} />}
+            element={
+              <DetailedInfo
+                tenders={tenders}
+                bids={bids}
+                isAuthenticated={isAuthenticated}
+                user={user}
+              />
+            }
           />
           <Route
             path="/tender/:id/bid"
             element={
               isAuthenticated ? (
-                <SubmitBid submitBid={submitBid} />
+                <SubmitBid tenders={tenders} user={user} />
               ) : (
                 <Navigate to="/login" />
               )

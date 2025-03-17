@@ -1,36 +1,39 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CreateTender.css";
-export default function CreateTender({ addTender, lastId }) {
+
+export default function CreateTender({ addTender }) {
   const today = new Date().toISOString().slice(0, 16).replace("T", " ");
+  const todayDate = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
 
   const [newTender, setNewTender] = useState({
-    id: lastId + 1,
-    name: "",
-    description: "",
-    term_start: new Date().toISOString().split("T")[0],
-    term_end: new Date().toISOString().split("T")[0],
-    notice: today,
-    close: today,
-    disclosingWinner: today,
-    status: "",
+    tender_name: "",
+    construction_from: todayDate,
+    construction_to: todayDate,
+    date_of_tender_notice: today,
+    date_of_tender_close: today,
+    date_of_tender_winner: today,
+    bidding_price: 0,
+    tender_status: "",
+    staff_id: "",
   });
 
   function handleSubmit(e) {
     e.preventDefault();
 
     addTender(newTender);
+
     setNewTender({
-      id: newTender.id + 1,
-      name: "",
-      description: "",
-      term_start: today,
-      term_end: today,
-      notice: today,
-      close: today,
-      disclosingWinner: today,
-      status: "",
+      tender_name: "",
+      construction_from: todayDate,
+      construction_to: todayDate,
+      date_of_tender_notice: today,
+      date_of_tender_close: today,
+      date_of_tender_winner: today,
+      bidding_price: 0,
+      tender_status: "",
+      staff_id: "",
     });
 
     navigate("/tenders");
@@ -43,95 +46,108 @@ export default function CreateTender({ addTender, lastId }) {
       [name]: value,
     }));
   }
+
   return (
     <div>
       <h3>Create New Tender</h3>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="name">Name:</label>
+          <label htmlFor="tender_name">Tender Name:</label>
           <input
-            id="name"
+            id="tender_name"
             type="text"
-            name="name"
-            value={newTender.name}
+            name="tender_name"
+            value={newTender.tender_name}
             onChange={handleInputChange}
             required
           />
         </div>
         <div>
-          <label htmlFor="description">Description:</label>
+          <label htmlFor="construction_from">Terms of Construction:</label>
           <input
-            id="description"
-            type="text"
-            name="description"
-            value={newTender.description}
-            onChange={handleInputChange}
-            required
-          />
-        </div>
-        <div>
-          <label htmlFor="term-start">Term of Construction:</label>
-          <input
-            id="term-start"
+            id="construction_from"
             type="date"
-            name="term-start"
-            value={newTender.term_start}
+            name="construction_from"
+            value={newTender.construction_from}
             onChange={handleInputChange}
             required
           />
           -
           <input
-            id="term-end"
+            id="construction_to"
             type="date"
-            name="term-end"
-            value={newTender.term_end}
+            name="construction_to"
+            value={newTender.construction_to}
             onChange={handleInputChange}
             required
           />
         </div>
         <div>
-          <label htmlFor="price">Estimated tender price:</label>
-          <input id="price" type="number" min="1" step="500" />
-        </div>
-        <div>
-          <label htmlFor="notice">Date of Tender Notice:</label>
+          <label htmlFor="date_of_tender_notice">Date of Tender Notice:</label>
           <input
-            id="notice"
+            id="date_of_tender_notice"
             type="datetime-local"
-            name="notice"
-            value={newTender.notice}
+            name="date_of_tender_notice"
+            value={newTender.date_of_tender_notice}
             onChange={handleInputChange}
             required
           />
         </div>
         <div>
-          <label htmlFor="close">Date of Tender Close:</label>
+          <label htmlFor="date_of_tender_close">Date of Tender Close:</label>
           <input
-            id="close"
+            id="date_of_tender_close"
             type="datetime-local"
-            name="close"
-            value={newTender.close}
+            name="date_of_tender_close"
+            value={newTender.date_of_tender_close}
             onChange={handleInputChange}
             required
           />
         </div>
         <div>
-          <label htmlFor="disclosingWinner">Date of Disclosing Winner:</label>
+          <label htmlFor="date_of_tender_winner">Date of Tender Winner:</label>
           <input
-            id="disclosingWinner"
+            id="date_of_tender_winner"
             type="datetime-local"
-            name="disclosingWinner"
-            value={newTender.disclosingWinner}
+            name="date_of_tender_winner"
+            value={newTender.date_of_tender_winner}
             onChange={handleInputChange}
           />
         </div>
         <div>
-          <label htmlFor="status">Tender Status:</label>
+          <label htmlFor="bidding_price">Bidding Price:</label>
           <input
-            id="status"
+            id="bidding_price"
+            type="number"
+            name="bidding_price"
+            value={newTender.bidding_price}
+            onChange={handleInputChange}
+            min="0"
+            step="500"
+            required
+          />
+        </div>
+        <div>
+          <label htmlFor="tender_status">Tender Status:</label>
+          <select
+            id="tender_status"
+            name="tender_status"
+            value={newTender.tender_status}
+            onChange={handleInputChange}
+            required
+          >
+            <option value="Open">Open</option>
+            <option value="Closed">Closed</option>
+            <option value="Pending">Pending</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="staff_id">Staff ID:</label>
+          <input
+            id="staff_id"
             type="text"
-            name="status"
-            value={newTender.status}
+            name="staff_id"
+            value={newTender.staff_id}
             onChange={handleInputChange}
             required
           />

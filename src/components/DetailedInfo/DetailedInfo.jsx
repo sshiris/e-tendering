@@ -8,7 +8,9 @@ export default function DetailedTenderInfo({ tenders }) {
   const [tender, setTender] = useState(null);
 
   useEffect(() => {
-    const foundTender = tenders.find((tender) => tender.id.toString() === id);
+    const foundTender = tenders.find(
+      (tender) => tender.tender_id.toString() === id
+    );
     if (foundTender) {
       setTender(foundTender);
     }
@@ -29,14 +31,15 @@ export default function DetailedTenderInfo({ tenders }) {
       <h2>Tender Details</h2>
 
       <div className="tender-card">
-        <h2>{tender.name}</h2>
+        <h2>{tender.tender_name}</h2>
 
         <div className="detail-row">
           <p>
-            <strong>ID:</strong> {tender.id}
+            <strong>ID:</strong> {tender.tender_id}
           </p>
           <p>
-            <strong>Notice Date:</strong> {tender.notice}
+            <strong>Notice Date:</strong>{" "}
+            {tender.date_of_tender_notice.slice(0, 16).replace("T", " ")}
           </p>
         </div>
 
@@ -45,25 +48,32 @@ export default function DetailedTenderInfo({ tenders }) {
             <strong>Description:</strong> {tender.description || "N/A"}
           </p>
           <p>
-            <strong>Close Date:</strong> {tender.close}
+            <strong>Close Date:</strong>{" "}
+            {tender.date_of_tender_close.slice(0, 16).replace("T", " ")}
           </p>
         </div>
 
         <div className="detail-row">
           <p>
-            <strong>Term of Construction:</strong> {tender.disclosingWinner}
-          </p>
-          <p>
-            <strong>Winner Disclosure:</strong> {tender.disclosingWinner}
+            <strong>Term of Construction:</strong>{" "}
+            {tender.construction_from.slice(0, 16).replace("T", " ")} to{" "}
+            {tender.construction_to.slice(0, 16).replace("T", " ")}
           </p>
         </div>
 
         <div className="detail-row">
           <p>
-            <strong>Estimated tender price:</strong> {tender.disclosingWinner}
+            <strong>Estimated tender price:</strong> {tender.bidding_price}
           </p>
+        </div>
+        <div className="detail-row">
           <p>
-            <strong>Reason of the winner:</strong> {tender.disclosingWinner}
+            <strong>Status</strong> {tender.tender_status}
+          </p>
+        </div>
+        <div className="detail-row">
+          <p>
+            <strong>Staff ID:</strong> {tender.staff_id}
           </p>
         </div>
         <div className="actions">

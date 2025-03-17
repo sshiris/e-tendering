@@ -1,22 +1,58 @@
-table,
-thead,
-tbody,
-th,
-td {
-  border: solid 1px;
+table {
+  width: 100%;
   border-collapse: collapse;
-  padding: 10px;
+  margin: 20px 0;
+  font-size: 1rem;
+  text-align: left;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-#tender-search {
-  position: relative;
-  top: -15px;
+thead {
+  background-color: #4caf50;
+  color: #ffffff;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 12px;
+}
+
+th {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+}
+
+td {
+  font-size: 0.9rem;
+  color: #333;
+}
+
+#tender-search input {
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  width: 100%;
+  max-width: 300px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.click-to-detail {
+  color: #0066cc;
+  font-weight: 500;
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .click-to-detail:hover {
   cursor: pointer;
-  color: #0066cc;
+  color: #004080;
   text-decoration: underline;
-  background-color: transparent;
-  border-color: inherit;
+  background-color: rgba(0, 102, 204, 0.1);
 }

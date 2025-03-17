@@ -1,59 +1,87 @@
 .login-container {
   max-width: 400px;
-  margin: 0 auto;
+  margin: 50px auto;
   padding: 2rem;
-  background-color: #f9f9f9;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to bottom right, #4caf50, #81c784);
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  color: white;
 }
 
 .heading {
   text-align: center;
-  color: #333;
-  font-family: Arial, sans-serif;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
 }
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
 input {
-  background-color: white;
-  border: 2px solid #4caf50;
-  padding: 0.75rem;
-  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: black;
+  border: none;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
   font-size: 1rem;
-  transition: border-color 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 input::placeholder {
-  color: #666;
+  color: #555;
   font-style: italic;
 }
 
 input:focus {
   outline: none;
-  border-color: #45a049;
-  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+  transform: scale(1.02);
 }
 
 button {
-  background-color: #4caf50;
-  color: white;
+  background-color: #ffffff;
   padding: 0.75rem;
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
+  border-radius: 6px;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: rgba(255, 255, 255, 0.8);
+  color: black;
+  transform: translateY(-3px);
 }
 
 button:active {
-  background-color: #3d8b40;
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: translateY(0);
+}
+
+.error-message {
+  background-color: rgba(255, 50, 50, 0.8);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: white;
 }

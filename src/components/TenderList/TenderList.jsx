@@ -8,16 +8,18 @@ function TenderList({ tenders, isAuthenticated }) {
     const query = event.target.value.toLowerCase();
 
     setFilteredTender(() =>
-      tenders.filter((tender) => tender.name.toLowerCase().includes(query))
+      tenders.filter((tender) =>
+        tender.tender_name.toLowerCase().includes(query)
+      )
     );
   };
 
   function handleRowClick(tender) {
-    navigate(`/tender/${tender.id}/details`);
+    navigate(`/tender/${tender.tender_id}/details`);
   }
   const navigate = useNavigate();
   return (
-    <div>
+    <div className="tender-list">
       <h2>Tenders</h2>
       <input
         id="tender-search"
@@ -25,6 +27,13 @@ function TenderList({ tenders, isAuthenticated }) {
         placeholder="Search for Tender Name"
         onChange={handleSearch}
       ></input>
+
+      {isAuthenticated && (
+        <button onClick={() => navigate("/create-tender")}>
+          Register Tender
+        </button>
+      )}
+
       <table>
         <thead>
           <tr>
@@ -39,25 +48,33 @@ function TenderList({ tenders, isAuthenticated }) {
         </thead>
         <tbody>
           {filteredTender.map((tender) => (
-            <tr key={tender.id}>
-              <td>{tender.id}</td>
+            <tr key={tender.tender_id}>
+              <td>{tender.tender_id}</td>
               <td>
                 <span
                   onClick={() => handleRowClick(tender)}
                   className="click-to-detail"
                 >
-                  {tender.name}
+                  {tender.tender_name}
                 </span>
               </td>
-              <td>{tender.notice}</td>
-              <td>{tender.close}</td>
-              <td>{tender.disclosingWinner}</td>
-              <td>{tender.status}</td>
+              <td>
+                {tender.date_of_tender_notice.slice(0, 16).replace("T", " ")}
+              </td>
+              <td>
+                {tender.date_of_tender_close.slice(0, 16).replace("T", " ")}
+              </td>
+              <td>
+                {tender.date_of_tender_winner.slice(0, 16).replace("T", " ")}
+              </td>
+              <td>{tender.tender_status}</td>
               <td>
                 {isAuthenticated && (
                   <button
                     onClick={() =>
-                      navigate(`/tender/${tender.id}/bid`, { state: tender })
+                      navigate(`/tender/${tender.tender_id}/bid`, {
+                        state: tender,
+                      })
                     }
                   >
                     Bid
@@ -68,12 +85,6 @@ function TenderList({ tenders, isAuthenticated }) {
           ))}
         </tbody>
       </table>
-
-      {isAuthenticated && (
-        <button onClick={() => navigate("/create-tender")}>
-          Register Tender
-        </button>
-      )}
     </div>
   );
 }
