@@ -13,6 +13,7 @@
             const tenderData = {
                 tender_id: generateTenderID(), // Generate a new unique ID for each submission
                 tender_name: document.getElementById("tender_name").value,
+                description: document.getElementById("tender_description").value, //description
                 construction_from: document.getElementById("construction_from").value,
                 construction_to: document.getElementById("construction_to").value,
                 date_of_tender_notice: document.getElementById("date_of_tender_notice").value,
@@ -46,42 +47,43 @@
             .catch(error => console.error("Error:", error));
         }
 
-        function saveTender() {
-            const tenderData = {
-                tender_id: generateTenderID(), // Generate a new unique ID for each submission
-                tender_name: document.getElementById("tender_name").value,
-                description: document.getElementById("tender_description").value, // add description
-                construction_from: document.getElementById("construction_from").value,
-                construction_to: document.getElementById("construction_to").value,
-                date_of_tender_notice: document.getElementById("date_of_tender_notice").value,
-                date_of_tender_close: document.getElementById("date_of_tender_close").value,
-                date_of_tender_winner: document.getElementById("date_of_tender_winner").value,
-                bidding_price: document.getElementById("bidding_price").value,
-                tender_status: document.getElementById("tender_status").value,
-                staff_id: document.getElementById("staff_id").value
-            };
+        function fetchTenders() {
+            fetch("http://localhost:5500/find")
+                .then(response => response.json())
+                .then(tenders => {
+                    const tendersTable = document.getElementById("tendersTable");
+                    tendersTable.innerHTML = ""; // Clear the table before adding new items
+                    tenders.forEach(tender => {
+                        const row = tendersTable.insertRow();
+                        row.insertCell(0).textContent = tender.tender_id;
+                        row.insertCell(1).textContent = tender.tender_name;
+                        row.insertCell(2).textContent = tender.description; //description
+                        row.insertCell(3).textContent = tender.construction_from;
+                        row.insertCell(4).textContent = tender.construction_to;
+                        row.insertCell(5).textContent = tender.date_of_tender_notice;
+                        row.insertCell(6).textContent = tender.date_of_tender_close;
+                        row.insertCell(7).textContent = tender.date_of_tender_winner;
+                        row.insertCell(8).textContent = tender.bidding_price;
+                        row.insertCell(9).textContent = tender.tender_status;
+                        row.insertCell(10).textContent = tender.staff_id;
+                        const deleteCell = row.insertCell(11);
+                        const deleteButton = document.createElement("button");
+                        deleteButton.textContent = "Delete";
+                        deleteButton.onclick = () => deleteTender(tender.tender_id);
+                        deleteCell.appendChild(deleteButton);
+                    });
 
-            console.log("Saved JSON:", JSON.stringify(tenderData));
-            alert("Tender saved! Check console for JSON output.");
-
-            fetch("http://localhost:5500/save_tender", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(tenderData)
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                alert(data.message);
-                fetchTenders(); // Refresh the list of tenders
-            })
-            .catch(error => console.error("Error:", error));
+                    // Populate Tender ID dropdown
+                    const tenderDropdown = document.getElementById("bid_tender_id");
+                    tenderDropdown.innerHTML = ""; // Clear existing options
+                    tenders.forEach(tender => {
+                        const option = document.createElement("option");
+                        option.value = tender.tender_id;
+                        option.textContent = tender.tender_name;
+                        tenderDropdown.appendChild(option);
+                    });
+                })
+                .catch(error => console.error("Error fetching tenders:", error));
         }
 
         function deleteTender(tenderId) {
@@ -335,7 +337,7 @@
     <form onsubmit="event.preventDefault(); saveTender();">
         <label>Tender ID: <input type="text" id="tender_id" readonly></label><br>
         <label>Tender Name: <input type="text" id="tender_name" required></label><br>
-        <label>Description: <input type="text" id="tender_description" required></label><br> <!-- add description -->
+        <label>Description: <input type="text" id="tender_description" required></label><br> <!-- description -->
         <label>Construction From: <input type="date" id="construction_from" required></label><br>
         <label>Construction To: <input type="date" id="construction_to" required></label><br>
         <label>Date of Tender Notice: <input type="date" id="date_of_tender_notice" required></label><br>
@@ -353,7 +355,7 @@
             <tr>
                 <th>Tender ID</th>
                 <th>Tender Name</th>
-                <th>Description</th> <!-- add description -->
+                <th>Description</th> <!-- description -->
                 <th>Construction From</th>
                 <th>Construction To</th>
                 <th>Date of Tender Notice</th>
