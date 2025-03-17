@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const tenderSchema = new mongoose.Schema({
   tender_id: { type: String, required: true, unique: true },
   tender_name: { type: String, required: true },
+  description: { type: String, required: true }, // Add description field
   construction_from: { type: Date, required: true },
   construction_to: { type: Date, required: true },
   date_of_tender_notice: { type: Date, required: true },
