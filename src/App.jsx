@@ -6,7 +6,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import Login from "./components/Login/Login";
 import TenderList from "./components/TenderList/TenderList";
 import CreateTender from "./components/CreateTender/CreateTender";
@@ -83,8 +83,8 @@ function App() {
       });
 
       setTenders([...tenders, response.data.tender || newTender]);
-      fetchTenders();
-
+      await fetchTenders();
+      console.log("Tender added successfully:", response.data);
       return response.data;
     } catch (error) {
       console.error("Error adding tender:", error);

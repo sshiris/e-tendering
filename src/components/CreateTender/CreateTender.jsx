@@ -123,7 +123,7 @@ export default function CreateTender({ addTender }) {
             value={newTender.bidding_price}
             onChange={handleInputChange}
             min="0"
-            step="500"
+            step="1000000"
             required
           />
         </div>
@@ -140,17 +140,6 @@ export default function CreateTender({ addTender }) {
             <option value="Closed">Closed</option>
             <option value="Pending">Pending</option>
           </select>
-        </div>
-        <div>
-          <label htmlFor="staff_id">Staff ID:</label>
-          <input
-            id="staff_id"
-            type="text"
-            name="staff_id"
-            value={newTender.staff_id}
-            onChange={handleInputChange}
-            required
-          />
         </div>
         <div>
           <button type="submit">Submit Tender</button>
