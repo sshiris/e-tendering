@@ -54,7 +54,7 @@ function App() {
       );
 
       if (!user) {
-        throw new Error("Invalid credentials");
+        throw new Error("Invalid user. Try again");
       }
       setIsAuthenticated(true);
       setUser({

@@ -13,6 +13,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+* {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
 a {
   font-weight: 500;
   color: #646cff;

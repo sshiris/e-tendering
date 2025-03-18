@@ -14,7 +14,6 @@
   font-family: "Poppins", sans-serif;
   font-size: 1.8rem;
   font-weight: 600;
-  margin-bottom: 1.5rem;
 }
 
 form {
@@ -72,6 +71,7 @@ button:active {
   border-radius: 4px;
   font-size: 0.9rem;
   text-align: center;
+  margin: 10px;
 }
 
 .form-group {
