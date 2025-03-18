@@ -20,14 +20,15 @@ function TenderList({ tenders, isAuthenticated }) {
   const navigate = useNavigate();
   return (
     <div className="tender-list">
-      <h2>Tenders</h2>
-      <input
-        id="tender-search"
-        type="text"
-        placeholder="Search for Tender Name"
-        onChange={handleSearch}
-      ></input>
-
+      <div className="search-container">
+        <span className="search-icon material-symbols-outlined">search</span>
+        <input
+          id="tender-search"
+          type="text"
+          placeholder="Search for Tender Name"
+          onChange={handleSearch}
+        ></input>
+      </div>
       {isAuthenticated && (
         <button onClick={() => navigate("/create-tender")}>
           Register Tender
