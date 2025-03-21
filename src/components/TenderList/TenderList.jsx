@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios"; // Import axios for API calls
 import "./TenderList.css";
+
 function TenderList({ tenders, isCompany, isCity }) {
   const API_URL = "http://localhost:5500";
   const navigate = useNavigate();
@@ -9,8 +11,7 @@ function TenderList({ tenders, isCompany, isCity }) {
 
   const handleSearch = (event) => {
     const query = event.target.value.toLowerCase();
-
-    setFilteredTender(() =>
+    setFilteredTender(
       tenders.filter((tender) =>
         tender.tender_name.toLowerCase().includes(query)
       )
@@ -21,13 +22,6 @@ function TenderList({ tenders, isCompany, isCity }) {
     navigate(`/tender/${tender.tender_id}/details`);
   }
 
-  const handleDelete = async (tender) => {
-    try {
-      await axios.delete(`${API_URL}/delete_tender/:${tender.tender_id}`);
-    } catch (error) {
-      console.error("Error deleting tender:", error);
-    }
-  };
   return (
     <div className="tender-list">
       <div className="search-container">
@@ -37,14 +31,8 @@ function TenderList({ tenders, isCompany, isCity }) {
           type="text"
           placeholder="Search for Tender Name"
           onChange={handleSearch}
-        ></input>
+        />
       </div>
-      {isCompany && (
-        <button onClick={() => navigate("/create-tender")}>
-          Register Tender
-        </button>
-      )}
-
       <table>
         <thead>
           <tr>
@@ -53,7 +41,8 @@ function TenderList({ tenders, isCompany, isCity }) {
             <th>Date of Tender Notice</th>
             <th>Date of Tender Close</th>
             <th>Date of Disclosing Winner</th>
-            <th>Tender status</th>
+            <th>Tender Status</th>
+            {(isCompany || isCity) && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -78,33 +67,35 @@ function TenderList({ tenders, isCompany, isCity }) {
                 {tender.date_of_tender_winner.slice(0, 16).replace("T", " ")}
               </td>
               <td>{tender.tender_status}</td>
-              {isCompany && (
-                <td>
-                  <button
-                    onClick={() =>
-                      navigate(`/tender/${tender.tender_id}/bid`, {
-                        state: tender,
-                      })
-                    }
-                  >
-                    Bid
-                  </button>
-                </td>
-              )}
-              {isCity && (
-                <td>
-                  <button>
-                    <i class="fa fa-pencil"></i>
-                  </button>
-                  <button onClick={() => handleDelete({ tender })}>
-                    <i class="fa fa-trash"></i>
-                  </button>
+              {(isCompany || isCity) && (
+                <td className="action-buttons">
+                  {isCompany && (
+                    <button
+                      className="action-btn bid-btn"
+                      onClick={() =>
+                        navigate(`/tender/${tender.tender_id}/bid`, {
+                          state: tender,
+                        })
+                      }
+                    >
+                      Bid
+                    </button>
+                  )}
                 </td>
               )}
             </tr>
           ))}
         </tbody>
       </table>
+
+      {isCompany && (
+        <button
+          className="action-btn register-btn"
+          onClick={() => navigate("/create-tender")}
+        >
+          +
+        </button>
+      )}
     </div>
   );
 }

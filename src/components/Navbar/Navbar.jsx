@@ -8,7 +8,7 @@ function Navbar({ isAuthenticated, handleLogout }) {
   return (
     <nav className="navbar">
       <div className="logo">
-        <h2>e-Tendering</h2>
+        <h2>e-Tender</h2>
       </div>
       <ul>
         <button
@@ -17,6 +17,11 @@ function Navbar({ isAuthenticated, handleLogout }) {
         >
           Home
         </button>
+        <button className="navbar-logo">Explore</button>
+        <button className="navbar-logo">Work & Study</button>
+        <button className="navbar-logo">Business</button>
+        <button className="navbar-logo">About Us</button>
+        <button className="navbar-logo">Events</button>
         {isAuthenticated ? (
           <button className="navbar-btn log-out" onClick={handleLogout}>
             Logout

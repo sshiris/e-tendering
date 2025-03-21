@@ -1,75 +1,131 @@
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 20px 0;
-  font-size: 1rem;
-  text-align: left;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+body {
+  margin: 0;
+  font-family: "Arial", sans-serif;
+  background-color: #f5f5f5;
 }
 
-thead {
-  background-color: #4caf50;
-  color: #ffffff;
-}
-
-tbody tr:nth-child(even) {
-  background-color: #f2f2f2;
-}
-
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 12px;
-}
-
-th {
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.9rem;
-}
-
-td {
-  font-size: 0.9rem;
-  color: #333;
+.tender-list {
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 0;
+  margin: 20px auto;
+  max-width: 1200px;
 }
 
 .search-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px;
-  border-radius: 50px;
-  background: #f6f6f6;
-  margin: 0 auto;
+  margin-bottom: 20px;
+}
+
+.search-container input {
+  width: 50%;
+  padding: 10px 10px 10px 30px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.search-container input:focus {
+  border-color: #001f8b;
 }
 
 .search-icon {
-  margin-left: 20px;
-  margin-right: -20px;
+  position: relative;
+  left: 35px;
+  color: #666;
+  font-size: 18px;
+  pointer-events: none;
 }
 
-#tender-search {
-  text-align: center;
-  margin-left: var(--padding);
-  outline: none;
+.action-btn {
+  color: #ffffff;
+  background-color: #001f8b;
+  padding: 8px 16px;
+  border-radius: 4px;
   border: none;
-  background: transparent;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+  margin: 0 5px 10px 0;
+  display: inline-block;
 }
 
-#tender-search::placeholder {
-  color: rgba(0, 0, 0, 0.4);
+.action-btn:hover {
+  background-color: #0035a0;
+}
+
+.action-btn:active {
+  background-color: #002c7a;
+}
+
+.bid-btn {
+  background-color: #2563eb;
+}
+
+.bid-btn:hover {
+  background-color: #1d4ed8;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background-color: #f5f5f5;
+}
+
+th,
+td {
+  padding: 12px 15px;
+  text-align: center;
+  border: 1px solid #e5e7eb;
+}
+
+th {
+  background-color: #001f8b;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+tr:hover {
+  background-color: #f9fafb;
 }
 
 .click-to-detail {
-  color: #0066cc;
-  font-weight: 500;
-  transition: color 0.3s ease, background-color 0.3s ease;
+  color: #001f8b;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
 .click-to-detail:hover {
-  cursor: pointer;
-  color: #004080;
+  color: #0035a0;
   text-decoration: underline;
-  background-color: rgba(0, 102, 204, 0.1);
+}
+
+.action-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.register-btn {
+  font-size: 2rem;
+  width: 4rem;
+  background-color: #719067;
+  border-radius: 8rem;
+  color: #ffffff;
+  cursor: pointer;
+  position: fixed;
+  bottom: 0.00005%;
+  left: 50%;
+  transition: background-color 0.2s ease;
+  text-align: center;
+  z-index: 1000;
+}
+
+.register-btn:hover {
+  background-color: #000000;
 }

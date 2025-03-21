@@ -6,7 +6,7 @@
 }
 
 .tender-card {
-  background-color: #f1f1f1;
+  background-color: #f6f1de;
   border: 10px solid #2a1818;
   padding: 20px;
   border-radius: 20px;
@@ -40,4 +40,12 @@
 .not-found {
   text-align: center;
   padding: 30px;
+}
+
+#update-btn {
+  background-color: rgb(37, 143, 27);
+}
+
+#delete-btn {
+  background-color: rgb(161, 13, 13);
 }

@@ -12,6 +12,7 @@ import TenderList from "./components/TenderList/TenderList";
 import CreateTender from "./components/CreateTender/CreateTender";
 import DetailedInfo from "./components/DetailedInfo/DetailedInfo";
 import SubmitBid from "./components/SubmitBid";
+import { ConfirmProvider } from "material-ui-confirm";
 import "./App.css";
 
 function App() {
@@ -126,7 +127,11 @@ function App() {
           />
           <Route
             path="/tender/:id/details"
-            element={<DetailedInfo tenders={tenders} />}
+            element={
+              <ConfirmProvider>
+                <DetailedInfo tenders={tenders} />
+              </ConfirmProvider>
+            }
           />
           <Route
             path="/tender/:id/bid"

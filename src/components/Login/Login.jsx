@@ -78,7 +78,12 @@ function Login({ handleLogin }) {
         </div>
 
         <div className="forgot-password-container">
-          <a className="forgot-password" href="#">
+          <a
+            className="forgot-password"
+            onClick={() =>
+              window.alert(`Maybe you can send us some email \u{1F62D}`)
+            }
+          >
             Forgot password?
           </a>
         </div>
