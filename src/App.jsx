@@ -15,7 +15,8 @@ import SubmitBid from "./components/SubmitBid";
 import "./App.css";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isCompany, setIsCompany] = useState(false);
+  const [isCity, setIsCity] = useState(false);
   const [user, setUser] = useState(null);
   const [tenders, setTenders] = useState([]);
   const [bids, setBids] = useState([]);
@@ -52,11 +53,16 @@ function App() {
       const user = users.find(
         (u) => u.email === email && u.password === password
       );
-
+      if (user.email.includes("@city")) {
+        setIsCity(true);
+        setIsCompany(false);
+      } else {
+        setIsCity(false);
+        setIsCompany(true);
+      }
       if (!user) {
         throw new Error("Invalid user. Try again");
       }
-      setIsAuthenticated(true);
       setUser({
         user_id: user.user_id,
         name: user.name,
@@ -72,41 +78,33 @@ function App() {
   };
 
   const handleLogout = () => {
-    setIsAuthenticated(false);
+    setIsCompany(false);
+    setIsCity(false);
     setUser(null);
-  };
-
-  const addTender = async (newTender) => {
-    try {
-      const response = await axios.post(`${API_URL}/save_tender`, {
-        ...newTender,
-      });
-
-      setTenders([...tenders, response.data.tender || newTender]);
-      await fetchTenders();
-      console.log("Tender added successfully:", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("Error adding tender:", error);
-      throw error;
-    }
   };
 
   return (
     <Router>
       <div className="app">
-        <Navbar isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
+        <Navbar
+          isAuthenticated={isCompany ?? isCity}
+          handleLogout={handleLogout}
+        />
         <Routes>
           <Route
             path="/"
             element={
-              <TenderList tenders={tenders} isAuthenticated={isAuthenticated} />
+              <TenderList
+                tenders={tenders}
+                isCompany={isCompany}
+                isCity={isCity}
+              />
             }
           />
           <Route
             path="/login"
             element={
-              isAuthenticated ? (
+              isCompany ? (
                 <Navigate to="/" />
               ) : (
                 <Login handleLogin={handleLogin} />
@@ -116,8 +114,11 @@ function App() {
           <Route
             path="/create-tender"
             element={
-              isAuthenticated ? (
-                <CreateTender addTender={addTender} />
+              isCompany ? (
+                <CreateTender
+                  setTenders={setTenders}
+                  fetchTenders={fetchTenders}
+                />
               ) : (
                 <Navigate to="/login" />
               )
@@ -125,19 +126,12 @@ function App() {
           />
           <Route
             path="/tender/:id/details"
-            element={
-              <DetailedInfo
-                tenders={tenders}
-                bids={bids}
-                isAuthenticated={isAuthenticated}
-                user={user}
-              />
-            }
+            element={<DetailedInfo tenders={tenders} />}
           />
           <Route
             path="/tender/:id/bid"
             element={
-              isAuthenticated ? (
+              isCompany ? (
                 <SubmitBid tenders={tenders} user={user} />
               ) : (
                 <Navigate to="/login" />

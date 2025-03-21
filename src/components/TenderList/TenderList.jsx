@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./TenderList.css";
-function TenderList({ tenders, isAuthenticated }) {
+function TenderList({ tenders, isCompany, isCity }) {
+  const API_URL = "http://localhost:5500";
+  const navigate = useNavigate();
+
   const [filteredTender, setFilteredTender] = useState(tenders);
 
   const handleSearch = (event) => {
@@ -17,7 +20,14 @@ function TenderList({ tenders, isAuthenticated }) {
   function handleRowClick(tender) {
     navigate(`/tender/${tender.tender_id}/details`);
   }
-  const navigate = useNavigate();
+
+  const handleDelete = async (tender) => {
+    try {
+      await axios.delete(`${API_URL}/delete_tender/:${tender.tender_id}`);
+    } catch (error) {
+      console.error("Error deleting tender:", error);
+    }
+  };
   return (
     <div className="tender-list">
       <div className="search-container">
@@ -29,7 +39,7 @@ function TenderList({ tenders, isAuthenticated }) {
           onChange={handleSearch}
         ></input>
       </div>
-      {isAuthenticated && (
+      {isCompany && (
         <button onClick={() => navigate("/create-tender")}>
           Register Tender
         </button>
@@ -44,7 +54,6 @@ function TenderList({ tenders, isAuthenticated }) {
             <th>Date of Tender Close</th>
             <th>Date of Disclosing Winner</th>
             <th>Tender status</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -69,8 +78,8 @@ function TenderList({ tenders, isAuthenticated }) {
                 {tender.date_of_tender_winner.slice(0, 16).replace("T", " ")}
               </td>
               <td>{tender.tender_status}</td>
-              <td>
-                {isAuthenticated && (
+              {isCompany && (
+                <td>
                   <button
                     onClick={() =>
                       navigate(`/tender/${tender.tender_id}/bid`, {
@@ -80,8 +89,18 @@ function TenderList({ tenders, isAuthenticated }) {
                   >
                     Bid
                   </button>
-                )}
-              </td>
+                </td>
+              )}
+              {isCity && (
+                <td>
+                  <button>
+                    <i class="fa fa-pencil"></i>
+                  </button>
+                  <button onClick={() => handleDelete({ tender })}>
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

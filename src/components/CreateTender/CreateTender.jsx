@@ -2,10 +2,26 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./CreateTender.css";
 
-export default function CreateTender({ addTender }) {
+export default function CreateTender({ setTenders, fetchTenders }) {
   const today = new Date().toISOString().slice(0, 16).replace("T", " ");
   const todayDate = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
+
+  const addTender = async (newTender) => {
+    try {
+      const response = await axios.post(`${API_URL}/save_tender`, {
+        ...newTender,
+      });
+
+      setTenders([...tenders, response.data.tender || newTender]);
+      await fetchTenders();
+      console.log("Tender added successfully:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error adding tender:", error);
+      throw error;
+    }
+  };
 
   const [newTender, setNewTender] = useState({
     tender_name: "",
