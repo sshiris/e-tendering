@@ -107,12 +107,13 @@ label input[type="checkbox"] {
 
 .forgot-password {
   font-size: 14px;
-  text-align: right;
-  color: #001f8b;
+  color: #2563eb;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .forgot-password:hover {
+  color: #1d4ed8;
   text-decoration: underline;
 }
 
@@ -126,4 +127,26 @@ label input[type="checkbox"] {
   cursor: pointer;
   font-size: 16px;
   text-decoration: none;
+}
+
+.register-container {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.register-container p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+}
+
+.register-link {
+  color: #2563eb;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.register-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
 }

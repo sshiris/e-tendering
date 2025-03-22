@@ -10,6 +10,7 @@ import Navbar from "./components/Navbar/Navbar";
 import Login from "./components/Login/Login";
 import TenderList from "./components/TenderList/TenderList";
 import CreateTender from "./components/CreateTender/CreateTender";
+import CreateUser from "./components/CreateUser/CreateUser";
 import DetailedInfo from "./components/DetailedInfo/DetailedInfo";
 import SubmitBid from "./components/SubmitBid";
 import { ConfirmProvider } from "material-ui-confirm";
@@ -112,6 +113,7 @@ function App() {
               )
             }
           />
+          <Route path="/create-user" element={<CreateUser />} />
           <Route
             path="/create-tender"
             element={
