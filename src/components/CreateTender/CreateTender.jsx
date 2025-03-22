@@ -18,7 +18,7 @@ export default function CreateTender({ setTenders, fetchTenders, user_id }) {
     date_of_tender_close: today,
     date_of_tender_winner: today,
     bidding_price: 0,
-    tender_status: "Open", 
+    tender_status: "Open",
     staff_id: user_id || "",
   });
   const [error, setError] = useState(null);

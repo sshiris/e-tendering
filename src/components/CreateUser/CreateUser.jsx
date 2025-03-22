@@ -18,18 +18,18 @@ export default function CreateUser() {
   const [error, setError] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(`${API_URL}/categories`);
-        setAvailableCategories(response.data);
-      } catch (err) {
-        console.error("Error fetching categories:", err);
-        setError("Failed to load categories");
-      }
-    };
-    fetchCategories();
-  }, []);
+  // useEffect(() => {
+  //   const fetchCategories = async () => {
+  //     try {
+  //       const response = await axios.get(`${API_URL}/categories`);
+  //       setAvailableCategories(response.data);
+  //     } catch (err) {
+  //       console.error("Error fetching categories:", err);
+  //       setError("Failed to load categories");
+  //     }
+  //   };
+  //   fetchCategories();
+  // }, []);
 
   const determineUserType = (email) => {
     if (!email) return "Guest";
@@ -40,30 +40,17 @@ export default function CreateUser() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(null);
-
-    const userData = {
-      ...newUser,
-      user_id: newUser.email,
-      categories: newUser.categories,
-    };
-
     try {
-      const response = await axios.post(`${API_URL}/create_user`, userData);
-      console.log("User created successfully:", response.data);
-
-      if (newUser.categories.length > 0) {
-        await axios.post(`${API_URL}/categories/update-users`, {
-          userId: response.data._id,
-          categoryIds: newUser.categories,
-        });
+      setError(null);
+      const response = await axios.post(`${API_URL}/create_user`, newUser);
+      if (setNewUser) {
+        setNewUser((prev) => [...prev, response.data.user || newUser]);
       }
-
-      navigate("/users");
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to create user");
-      console.error("Error creating user:", err);
+      console.log("User added successfully:", response.data);
+      navigate("/login");
+    } catch (error) {
+      console.error("Error adding tender:", error);
+      setError(error.response?.data?.message || "Failed to add tender");
     }
   };
 
@@ -79,12 +66,7 @@ export default function CreateUser() {
   };
 
   const handleCategoryChange = (categoryId) => {
-    setNewUser((prev) => {
-      const categories = prev.categories.includes(categoryId)
-        ? prev.categories.filter((id) => id !== categoryId)
-        : [...prev.categories, categoryId];
-      return { ...prev, categories };
-    });
+    console.log("H2llo");
   };
 
   return (
@@ -153,7 +135,7 @@ export default function CreateUser() {
             disabled
           />
         </div>
-        <div className="form-group">
+        {/* <div className="form-group">
           <label>Categories (Optional)</label>
           <div className="category-checkboxes">
             {availableCategories.map((category) => (
@@ -171,7 +153,7 @@ export default function CreateUser() {
           {newUser.categories.length === 0 && (
             <span className="no-categories">No categories selected</span>
           )}
-        </div>
+        </div> */}
         <div className="form-actions">
           <button type="submit" className="submit-btn">
             Create User
@@ -179,7 +161,7 @@ export default function CreateUser() {
           <button
             type="button"
             className="cancel-btn"
-            onClick={() => navigate("/users")}
+            onClick={() => navigate("/login")}
           >
             Cancel
           </button>

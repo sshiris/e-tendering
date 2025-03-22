@@ -66,7 +66,13 @@ function TenderList({ tenders, isCompany, isCity }) {
               <td>
                 {tender.date_of_tender_winner.slice(0, 16).replace("T", " ")}
               </td>
-              <td>{tender.tender_status}</td>
+              <td
+                style={{
+                  color: tender.tender_status === "Open" ? "green" : "black",
+                }}
+              >
+                {tender.tender_status}
+              </td>
               {(isCompany || isCity) && (
                 <td className="action-buttons">
                   {isCompany && (
