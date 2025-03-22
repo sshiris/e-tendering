@@ -4,7 +4,7 @@ import axios from "axios";
 import "./DetailedInfo.css";
 import { useConfirm } from "material-ui-confirm";
 
-export default function DetailedTenderInfo({ tenders }) {
+export default function DetailedTenderInfo({ tenders, fetchTenders }) {
   const confirm = useConfirm();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -19,7 +19,8 @@ export default function DetailedTenderInfo({ tenders }) {
       .then(() => {
         axios
           .delete(`${API_URL}/delete_tender/${tender.tender_id}`)
-          .then(() => {
+          .then(async () => {
+            await fetchTenders();
             navigate("/");
           })
           .catch((error) => {

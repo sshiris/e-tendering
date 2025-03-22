@@ -119,6 +119,7 @@ function App() {
                 <CreateTender
                   setTenders={setTenders}
                   fetchTenders={fetchTenders}
+                  user_id={user.user_id}
                 />
               ) : (
                 <Navigate to="/login" />
@@ -129,7 +130,7 @@ function App() {
             path="/tender/:id/details"
             element={
               <ConfirmProvider>
-                <DetailedInfo tenders={tenders} />
+                <DetailedInfo tenders={tenders} fetchTenders={fetchTenders} />
               </ConfirmProvider>
             }
           />

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios"; // Import axios for API calls
+import axios from "axios";
 import "./TenderList.css";
 
 function TenderList({ tenders, isCompany, isCity }) {
