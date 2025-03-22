@@ -1,0 +1,135 @@
+.tender-detail {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.tender-detail h2 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #001f8b;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.tender-card {
+  background-color: #f9fafb;
+  border: 2px solid #2a1818;
+  padding: 25px;
+  border-radius: 6px;
+}
+
+.status {
+  color: #6b7280;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.detail-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.detail-row p {
+  margin: 0;
+  font-size: 1rem;
+  color: #333;
+  flex: 1 1 300px;
+}
+
+.detail-row p strong {
+  color: #001f8b;
+  font-weight: 500;
+}
+
+.actions {
+  margin-top: 25px;
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.actions button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#update-btn {
+  background-color: #258f1b;
+}
+
+#update-btn:hover {
+  background-color: #1d7a15;
+  transform: translateY(-2px);
+}
+
+#delete-btn {
+  background-color: #a10d0d;
+}
+
+#delete-btn:hover {
+  background-color: #870b0b;
+  transform: translateY(-2px);
+}
+
+.actions button:not(#update-btn):not(#delete-btn) {
+  background-color: #001f8b;
+}
+
+.actions button:not(#update-btn):not(#delete-btn):hover {
+  background-color: #0035a0;
+  transform: translateY(-2px);
+}
+
+.not-found {
+  text-align: center;
+  padding: 40px;
+  background-color: #ffffff;
+  margin: 30px auto;
+  max-width: 900px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.not-found h2 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  color: #001f8b;
+  margin-bottom: 15px;
+}
+
+.not-found p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+.not-found button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: none;
+  background-color: #001f8b;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.not-found button:hover {
+  background-color: #0035a0;
+  transform: translateY(-2px);
+}
