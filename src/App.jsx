@@ -14,6 +14,7 @@ import CreateUser from "./components/CreateUser/CreateUser";
 import DetailedInfo from "./components/DetailedInfo/DetailedInfo";
 import SubmitBid from "./components/SubmitBid";
 import { ConfirmProvider } from "material-ui-confirm";
+
 import "./App.css";
 
 function App() {

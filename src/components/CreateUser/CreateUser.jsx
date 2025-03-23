@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import Button from "@mui/material/Button";
 import "./CreateUser.css";
 
 export default function CreateUser() {
@@ -15,21 +20,11 @@ export default function CreateUser() {
     email: "",
     categories: [],
   });
+
   const [error, setError] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
-
-  // useEffect(() => {
-  //   const fetchCategories = async () => {
-  //     try {
-  //       const response = await axios.get(`${API_URL}/categories`);
-  //       setAvailableCategories(response.data);
-  //     } catch (err) {
-  //       console.error("Error fetching categories:", err);
-  //       setError("Failed to load categories");
-  //     }
-  //   };
-  //   fetchCategories();
-  // }, []);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   const determineUserType = (email) => {
     if (!email) return "Guest";
@@ -40,17 +35,19 @@ export default function CreateUser() {
   };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
       setError(null);
       const response = await axios.post(`${API_URL}/create_user`, newUser);
-      if (setNewUser) {
-        setNewUser((prev) => [...prev, response.data.user || newUser]);
-      }
+      const userListResponse = await axios.get(`${API_URL}/users`);
+      const userList = userListResponse.data;
+      const matchedUser = userList.find((user) => user.email === newUser.email);
+      setUserId(matchedUser ? matchedUser.user_id : "unknown");
+      setOpenDialog(true);
       console.log("User added successfully:", response.data);
-      navigate("/login");
     } catch (error) {
-      console.error("Error adding tender:", error);
-      setError(error.response?.data?.message || "Failed to add tender");
+      console.error("Error adding user:", error);
+      setError(error.response?.data?.message || "Failed to add user");
     }
   };
 
@@ -67,6 +64,11 @@ export default function CreateUser() {
 
   const handleCategoryChange = (categoryId) => {
     console.log("H2llo");
+  };
+
+  const handleDialogClose = () => {
+    setOpenDialog(false);
+    navigate("/login");
   };
 
   return (
@@ -135,25 +137,6 @@ export default function CreateUser() {
             disabled
           />
         </div>
-        {/* <div className="form-group">
-          <label>Categories (Optional)</label>
-          <div className="category-checkboxes">
-            {availableCategories.map((category) => (
-              <label key={category._id} className="category-checkbox">
-                <input
-                  type="checkbox"
-                  value={category._id}
-                  checked={newUser.categories.includes(category._id)}
-                  onChange={() => handleCategoryChange(category._id)}
-                />
-                {category.category_name}
-              </label>
-            ))}
-          </div>
-          {newUser.categories.length === 0 && (
-            <span className="no-categories">No categories selected</span>
-          )}
-        </div> */}
         <div className="form-actions">
           <button type="submit" className="submit-btn">
             Create User
@@ -167,6 +150,20 @@ export default function CreateUser() {
           </button>
         </div>
       </form>
+      <Dialog open={openDialog} onClose={handleDialogClose}>
+        <DialogTitle>User Created</DialogTitle>
+        <DialogContent>
+          <p>
+            User created successfully! You can use your ID to login:{" "}
+            <strong>{userId}</strong>
+          </p>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary">
+            OK
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

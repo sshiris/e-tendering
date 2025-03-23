@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "./TenderList.css";
 
 function TenderList({ tenders, isCompany, isCity }) {
-  const API_URL = "http://localhost:5500";
   const navigate = useNavigate();
 
   const [filteredTender, setFilteredTender] = useState(tenders);
