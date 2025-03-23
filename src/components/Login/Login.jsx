@@ -4,7 +4,7 @@ import "./Login.css";
 
 function Login({ handleLogin }) {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
@@ -13,13 +13,13 @@ function Login({ handleLogin }) {
   const [lockoutTime, setLockoutTime] = useState(null);
 
   useEffect(() => {
-    const savedEmail = localStorage.getItem("rememberedEmail");
+    const savedIdentifier = localStorage.getItem("rememberedIdentifier");
     const savedPassword = localStorage.getItem("rememberedPassword");
     const attempts = parseInt(localStorage.getItem("loginAttempts") || "0", 10);
     const lockoutTimestamp = localStorage.getItem("lockoutTime");
 
-    if (savedEmail && savedPassword) {
-      setEmail(savedEmail);
+    if (savedIdentifier && savedPassword) {
+      setIdentifier(savedIdentifier);
       setPassword(savedPassword);
       setRememberMe(true);
     }
@@ -27,8 +27,7 @@ function Login({ handleLogin }) {
     setLoginAttempts(attempts);
 
     if (lockoutTimestamp) {
-      const timeLeft =
-        parseInt(lockoutTimestamp, 10) + 5 * 60 * 1000 - Date.now();
+      const timeLeft = parseInt(lockoutTimestamp, 10) + 60 * 1000 - Date.now();
       if (timeLeft > 0) {
         setIsLocked(true);
         setLockoutTime(timeLeft);
@@ -61,6 +60,10 @@ function Login({ handleLogin }) {
     }
   }, [isLocked, lockoutTime]);
 
+  const determineIdentifierType = (value) => {
+    return value.includes("@") ? "email" : "user_id";
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -73,13 +76,19 @@ function Login({ handleLogin }) {
     }
 
     try {
-      await handleLogin(email, password);
+      const identifierType = determineIdentifierType(identifier);
+      const email = identifierType === "email" ? identifier : "";
+      const id = identifierType === "user_id" ? identifier : "";
+
+      await handleLogin(email, password, id);
 
       if (rememberMe) {
-        localStorage.setItem("rememberedEmail", email);
+        localStorage.setItem("rememberedIdentifier", identifier);
+        localStorage.setItem("rememberedIdentifierType", identifierType);
         localStorage.setItem("rememberedPassword", password);
       } else {
-        localStorage.removeItem("rememberedEmail");
+        localStorage.removeItem("rememberedIdentifier");
+        localStorage.removeItem("rememberedIdentifierType");
         localStorage.removeItem("rememberedPassword");
       }
 
@@ -96,7 +105,7 @@ function Login({ handleLogin }) {
         const lockoutStart = Date.now();
         localStorage.setItem("lockoutTime", lockoutStart.toString());
         setLockoutTime(5 * 60 * 1000);
-        setError("Too many failed attempts. Account locked for 5 minutes.");
+        setError("Too many failed attempts. Account locked for 1 minute.");
       } else {
         setError(
           err.message || `Login failed. ${3 - newAttempts} attempts remaining.`
@@ -118,13 +127,13 @@ function Login({ handleLogin }) {
 
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
-          <label htmlFor="email">Email</label>
+          <label htmlFor="identifier">Email or User ID</label>
           <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter your email"
+            id="identifier"
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="Enter your email or user ID"
             required
             disabled={isLocked}
           />

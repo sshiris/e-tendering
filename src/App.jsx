@@ -48,13 +48,14 @@ function App() {
     }
   };
 
-  const handleLogin = async (email, password) => {
+  const handleLogin = async (email, password, id) => {
     try {
       const response = await axios.get(`${API_URL}/users`);
       const users = response.data;
 
       const user = users.find(
-        (u) => u.email === email && u.password === password
+        (u) =>
+          (u.email === email || u.user_id === id) && u.password === password
       );
       if (user.email.includes("@city")) {
         setIsCity(true);
