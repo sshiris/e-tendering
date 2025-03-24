@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Registration</title>
+    <style>
+        /* Set a background image and style for the body */
+        body {
+            background-image: url('public/background1.jpeg'); /* Replace with your image path */
+            background-size: cover; 
+            background-repeat: no-repeat; 
+            background-attachment: fixed; 
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Styling the content box */
+        .content {
+            background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent white */
+            padding: 30px;
+            margin: 50px auto;
+            width: 80%;
+            max-width: 600px; /* Limiting the width for readability */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for 3D effect */
+        }
+
+        h2 {
+            text-align: center;
+            font-size: 28px;
+            color: #333;
+        }
+
+        /* Styling the form elements */
+        label {
+            font-size: 16px;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus {
+            border-color: #007BFF; /* Change border color on focus */
+            outline: none;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007BFF; /* Button color */
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3; /* Darker shade on hover */
+        }
+
+        button:active {
+            background-color: #004085; /* Even darker on click */
+        }
+
+        /* Responsive design for smaller screens */
+        @media (max-width: 768px) {
+            .content {
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h2>Register</h2>
+        <form id="registerForm">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+
+            <label for="userType">User Type:</label>
+            <select id="userType" name="userType">
+                <option value="1">Admin<option>  
+                <option value="2">Bidder</option>
+                <option value="3">Staff</option>
+            </select>
+
+            <label for="category">Category:</label>
+            <select id="category" name="category"></select>
+
+            <button type="submit">Register</button>
+        </form>
+    </div>
+
+    <script> 
+    document.addEventListener('DOMContentLoaded', () => {
+        // Fetch categories from the server to populate the dropdown
+        fetch('http://localhost:8588/categories')
+            .then(response => response.json())
+            .then(categories => {
+                const categorySelect = document.getElementById('category');
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.CATEGORY_ID; // Assuming CATEGORY_ID is the key
+                    option.textContent = category.CATEGORY_NAME;
+                    categorySelect.appendChild(option);
+                });
+            });
+
+        document.getElementById('registerForm').addEventListener('submit', function(event) {
+            event.preventDefault(); 
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const userType = document.getElementById('userType').value;
+            const category = document.getElementById('category').value;
+
+            fetch('http://localhost:8588/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password, email, userType, category })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Registration successful!');
+                    window.location.href = 'login.html'; 
+                } else {
+                    alert('Registration failed: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during registration.');
+            });
+        });
+    });
+    </script>
+</body>
+</html>
