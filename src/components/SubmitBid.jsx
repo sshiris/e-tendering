@@ -1,24 +1,27 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-function SubmitBid({ submitBid }) {
+function SubmitBid({ submitBid, user_id }) {
   const navigate = useNavigate();
   const location = useLocation();
   const tender = location?.state;
   const [amount, setAmount] = useState("");
 
+  console.log(tender);
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    submitBid(tender.id, amount);
-    navigate("/tenders");
+    console.log("Submitting bid", tender.tender_id, amount);
+    submitBid(tender.tender_id, amount, user_id);
+    navigate("/company");
   };
 
   if (!tender) return <div>No tender selected</div>;
 
   return (
     <div>
-      <h2>Bid for {tender.title}</h2>
-      <p>Budget: {tender.budget}</p>
+      <h2>Bid for {tender.tender_name}</h2>
+      <p>Budget: {tender.bidding_price}</p>
       <form onSubmit={handleSubmit}>
         <input
           type="text"

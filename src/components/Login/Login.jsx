@@ -64,9 +64,60 @@ function Login({ handleLogin }) {
     return value.includes("@") ? "email" : "user_id";
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setError("");
+
+  //   if (isLocked) {
+  //     setError(
+  //       `Account locked. Try again in ${Math.ceil(lockoutTime / 1000)} seconds.`
+  //     );
+  //     return;
+  //   }
+
+  //   try {
+  //     const identifierType = determineIdentifierType(identifier);
+  //     const email = identifierType === "email" ? identifier : "";
+  //     const id = identifierType === "user_id" ? identifier : "";
+
+  //     await handleLogin(email, password, id);
+
+  //     if (rememberMe) {
+  //       localStorage.setItem("rememberedIdentifier", identifier);
+  //       localStorage.setItem("rememberedIdentifierType", identifierType);
+  //       localStorage.setItem("rememberedPassword", password);
+  //     } else {
+  //       localStorage.removeItem("rememberedIdentifier");
+  //       localStorage.removeItem("rememberedIdentifierType");
+  //       localStorage.removeItem("rememberedPassword");
+  //     }
+
+  //     localStorage.setItem("loginAttempts", "0");
+  //     setLoginAttempts(0);
+  //     navigate("/tenders");
+  //   } catch (err) {
+  //     const newAttempts = loginAttempts + 1;
+  //     setLoginAttempts(newAttempts);
+  //     localStorage.setItem("loginAttempts", newAttempts.toString());
+
+  //     if (newAttempts >= 3) {
+  //       setIsLocked(true);
+  //       const lockoutStart = Date.now();
+  //       localStorage.setItem("lockoutTime", lockoutStart.toString());
+  //       setLockoutTime(5 * 60 * 1000);
+  //       setError("Too many failed attempts. Account locked for 1 minute.");
+  //     } else {
+  //       setError(
+  //         err.message || `Login failed. ${3 - newAttempts} attempts remaining.`
+  //       );
+  //     }
+  //     console.log(err.message);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setError(""); // Reset any previous error
 
     if (isLocked) {
       setError(
@@ -80,21 +131,26 @@ function Login({ handleLogin }) {
       const email = identifierType === "email" ? identifier : "";
       const id = identifierType === "user_id" ? identifier : "";
 
+      // Assuming handleLogin will set the user information and also check credentials
       await handleLogin(email, password, id);
 
+      // Store the user data in localStorage after successful login
       if (rememberMe) {
         localStorage.setItem("rememberedIdentifier", identifier);
-        localStorage.setItem("rememberedIdentifierType", identifierType);
         localStorage.setItem("rememberedPassword", password);
       } else {
         localStorage.removeItem("rememberedIdentifier");
-        localStorage.removeItem("rememberedIdentifierType");
         localStorage.removeItem("rememberedPassword");
       }
 
+      // Store additional user data in localStorage
+      localStorage.setItem("user_id", user.user_id);
+      localStorage.setItem("name", user.name);
+      localStorage.setItem("email", user.email);
+
       localStorage.setItem("loginAttempts", "0");
       setLoginAttempts(0);
-      navigate("/tenders");
+      navigate("/tenders"); // Redirect after successful login
     } catch (err) {
       const newAttempts = loginAttempts + 1;
       setLoginAttempts(newAttempts);
@@ -104,14 +160,13 @@ function Login({ handleLogin }) {
         setIsLocked(true);
         const lockoutStart = Date.now();
         localStorage.setItem("lockoutTime", lockoutStart.toString());
-        setLockoutTime(5 * 60 * 1000);
+        setLockoutTime(5 * 60 * 1000); // Account locked for 1 minute
         setError("Too many failed attempts. Account locked for 1 minute.");
       } else {
         setError(
           err.message || `Login failed. ${3 - newAttempts} attempts remaining.`
         );
       }
-      console.log(err.message);
     }
   };
 

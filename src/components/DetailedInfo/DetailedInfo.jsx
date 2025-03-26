@@ -4,7 +4,7 @@ import axios from "axios";
 import "./DetailedInfo.css";
 import { useConfirm } from "material-ui-confirm";
 
-export default function DetailedTenderInfo({ tenders, fetchTenders }) {
+export default function DetailedTenderInfo({ tenders, fetchTenders, user }) {
   const confirm = useConfirm();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -51,6 +51,8 @@ export default function DetailedTenderInfo({ tenders, fetchTenders }) {
     );
   }
 
+  const isCompany = user && user.user_type == "Company";
+  console.log("isCompany:", isCompany);
   return (
     <div className="tender-detail">
       <h2>Tender Details</h2>
@@ -97,12 +99,21 @@ export default function DetailedTenderInfo({ tenders, fetchTenders }) {
           </p>
         </div>
         <div className="actions">
-          <button id="update-btn">Update</button>
-          <button id="delete-btn" onClick={() => handleDelete(tender)}>
-            Delete
-          </button>
-          <button onClick={() => navigate("/")}>Back</button>
+          {!isCompany && (
+            <div>
+              <button id="update-btn">Update</button>
+              <button id="delete-btn" onClick={() => handleDelete(tender)}>
+                Delete
+              </button>
+              <button onClick={() => navigate("/")}>Back</button>
+            </div>
+          )}
         </div>
+        {isCompany && (
+          <div>
+            <button onClick={() => navigate("/company")}>Back</button>
+          </div>
+        )}
       </div>
     </div>
   );

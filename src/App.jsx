@@ -16,6 +16,8 @@ import SubmitBid from "./components/SubmitBid";
 import { ConfirmProvider } from "material-ui-confirm";
 
 import "./App.css";
+import CompanyPage from "./components/companyPage/CompanyPage";
+import CompanyBids from "./components/companyBids/CompanyBids";
 
 function App() {
   const [isCompany, setIsCompany] = useState(false);
@@ -67,6 +69,9 @@ function App() {
       if (!user) {
         throw new Error("Invalid user. Try again");
       }
+
+      localStorage.setItem("user", JSON.stringify(user));
+
       setUser({
         user_id: user.user_id,
         name: user.name,
@@ -85,6 +90,30 @@ function App() {
     setIsCompany(false);
     setIsCity(false);
     setUser(null);
+  };
+
+  const submitBid = async (tender_id, amount, user_id) => {
+    const bidData = {
+      amount: amount,
+      user_id: user_id,
+      tender_id: tender_id,
+    };
+    console.log("Bid Data:", bidData);
+    console.log("User ID:", user_id);
+    console.log("Tender ID:", tender_id);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5500/create_bid",
+        bidData
+      );
+      // Handle success
+    } catch (error) {
+      console.error(
+        "Error submitting bid:",
+        error.response?.data || error.message
+      );
+    }
   };
 
   return (
@@ -106,10 +135,31 @@ function App() {
             }
           />
           <Route
+            path="/company"
+            element={
+              isCompany ? (
+                <>
+                  <CompanyPage></CompanyPage>
+                  <TenderList tenders={tenders} isCompany={isCompany} />
+                </>
+              ) : (
+                <Navigate to="/login" /> // Redirect to login if not a company
+              )
+            }
+          />
+
+          <Route
+            path="/company/bids"
+            element={
+              isCompany ? <CompanyBids user={user} /> : <Navigate to="/login" />
+            }
+          />
+
+          <Route
             path="/login"
             element={
               isCompany ? (
-                <Navigate to="/" />
+                <Navigate to="/company" />
               ) : (
                 <Login handleLogin={handleLogin} />
               )
@@ -134,7 +184,11 @@ function App() {
             path="/tender/:id/details"
             element={
               <ConfirmProvider>
-                <DetailedInfo tenders={tenders} fetchTenders={fetchTenders} />
+                <DetailedInfo
+                  tenders={tenders}
+                  fetchTenders={fetchTenders}
+                  user={user}
+                />
               </ConfirmProvider>
             }
           />
@@ -142,7 +196,7 @@ function App() {
             path="/tender/:id/bid"
             element={
               isCompany ? (
-                <SubmitBid tenders={tenders} user={user} />
+                <SubmitBid submitBid={submitBid} user_id={user?.user_id} />
               ) : (
                 <Navigate to="/login" />
               )

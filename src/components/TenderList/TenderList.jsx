@@ -92,7 +92,7 @@ function TenderList({ tenders, isCompany, isCity }) {
         </tbody>
       </table>
 
-      {isCompany && (
+      {isCity && (
         <button
           className="action-btn register-btn"
           onClick={() => navigate("/create-tender")}
