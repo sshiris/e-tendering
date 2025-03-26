@@ -139,7 +139,7 @@ function App() {
             element={
               isCompany ? (
                 <>
-                  <CompanyPage></CompanyPage>
+                  <CompanyPage user={user}></CompanyPage>
                   <TenderList tenders={tenders} isCompany={isCompany} />
                 </>
               ) : (

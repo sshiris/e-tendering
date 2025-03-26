@@ -1,12 +1,12 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-const CompanyPage = () => {
+const CompanyPage = ({ user }) => {
   const navigate = useNavigate();
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">Welcome to Your Company Dashboard</h1>
+      <h1 className="text-2xl font-bold">Welcome to {user.name} Dashboard</h1>
 
       <button
         onClick={() => navigate("/company/bids")}
