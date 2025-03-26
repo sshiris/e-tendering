@@ -14,6 +14,7 @@ import CreateUser from "./components/CreateUser/CreateUser";
 import DetailedInfo from "./components/DetailedInfo/DetailedInfo";
 import SubmitBid from "./components/SubmitBid";
 import { ConfirmProvider } from "material-ui-confirm";
+import Home from "./components/Home/Home";
 
 import "./App.css";
 import UpdateTender from "./components/UpdateTender/UpdateTender";
@@ -96,6 +97,7 @@ function App() {
           handleLogout={handleLogout}
         />
         <Routes>
+          <Route path="/home" element={<Home />} />
           <Route
             path="/"
             element={
@@ -163,7 +165,7 @@ function App() {
               )
             }
           />
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </div>
     </Router>

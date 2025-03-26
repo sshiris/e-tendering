@@ -13,7 +13,7 @@ function Navbar({ isAuthenticated, handleLogout }) {
       <ul>
         <button
           className="navbar-logo tender-home"
-          onClick={() => navigate(isAuthenticated ? "/tenders" : "/")}
+          onClick={() => navigate("/home")} // Navigate to /home
         >
           Home
         </button>
@@ -22,6 +22,14 @@ function Navbar({ isAuthenticated, handleLogout }) {
         <button className="navbar-logo">Business</button>
         <button className="navbar-logo">About Us</button>
         <button className="navbar-logo">Events</button>
+        {isAuthenticated && (
+          <button
+            className="navbar-logo browse-list"
+            onClick={() => navigate("/")} // Navigate to the tender list
+          >
+            Browse List
+          </button>
+        )}
         {isAuthenticated ? (
           <button className="navbar-btn log-out" onClick={handleLogout}>
             Logout
