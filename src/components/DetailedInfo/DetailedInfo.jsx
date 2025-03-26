@@ -97,7 +97,12 @@ export default function DetailedTenderInfo({ tenders, fetchTenders }) {
           </p>
         </div>
         <div className="actions">
-          <button id="update-btn">Update</button>
+          <button
+            id="update-btn"
+            onClick={() => navigate(`/update-tender/${tender.tender_id}`)}
+          >
+            Update
+          </button>
           <button id="delete-btn" onClick={() => handleDelete(tender)}>
             Delete
           </button>

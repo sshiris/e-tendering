@@ -16,6 +16,7 @@ import SubmitBid from "./components/SubmitBid";
 import { ConfirmProvider } from "material-ui-confirm";
 
 import "./App.css";
+import UpdateTender from "./components/UpdateTender/UpdateTender";
 
 function App() {
   const [isCompany, setIsCompany] = useState(false);
@@ -122,6 +123,20 @@ function App() {
               isCompany ? (
                 <CreateTender
                   setTenders={setTenders}
+                  fetchTenders={fetchTenders}
+                  user_id={user.user_id}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/update-tender/:id"
+            element={
+              isCompany ? (
+                <UpdateTender
+                  tenders={tenders}
                   fetchTenders={fetchTenders}
                   user_id={user.user_id}
                 />
