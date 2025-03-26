@@ -4,7 +4,7 @@ import axios from "axios";
 import "./DetailedInfo.css";
 import { useConfirm } from "material-ui-confirm";
 
-export default function DetailedTenderInfo({ tenders, fetchTenders }) {
+export default function DetailedTenderInfo({ tenders, fetchTenders, isCity }) {
   const confirm = useConfirm();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -96,16 +96,23 @@ export default function DetailedTenderInfo({ tenders, fetchTenders }) {
             <strong>Staff ID:</strong> {tender.staff_id}
           </p>
         </div>
+        <div>
+          <a href="">Bidding List</a>
+        </div>
         <div className="actions">
-          <button
-            id="update-btn"
-            onClick={() => navigate(`/update-tender/${tender.tender_id}`)}
-          >
-            Update
-          </button>
-          <button id="delete-btn" onClick={() => handleDelete(tender)}>
-            Delete
-          </button>
+          {isCity && (
+            <button
+              id="update-btn"
+              onClick={() => navigate(`/update-tender/${tender.tender_id}`)}
+            >
+              Update
+            </button>
+          )}
+          {isCity && (
+            <button id="delete-btn" onClick={() => handleDelete(tender)}>
+              Delete
+            </button>
+          )}
           <button onClick={() => navigate("/")}>Back</button>
         </div>
       </div>

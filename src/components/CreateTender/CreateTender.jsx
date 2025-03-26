@@ -34,7 +34,7 @@ export default function CreateTender({ setTenders, fetchTenders, user_id }) {
         await fetchTenders();
       }
       console.log("Tender added successfully:", response.data);
-      navigate("/tenders");
+      navigate("/");
     } catch (error) {
       console.error("Error adding tender:", error);
       setError(error.response?.data?.message || "Failed to add tender");
@@ -150,7 +150,7 @@ export default function CreateTender({ setTenders, fetchTenders, user_id }) {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="bidding_price">Bidding Price</label>
+          <label htmlFor="bidding_price">Estimated Price</label>
           <input
             id="bidding_price"
             type="number"
@@ -195,7 +195,7 @@ export default function CreateTender({ setTenders, fetchTenders, user_id }) {
           <button
             type="button"
             className="cancel-btn"
-            onClick={() => navigate("/tenders")}
+            onClick={() => navigate("/")}
           >
             Cancel
           </button>
