@@ -40,7 +40,7 @@ function TenderList({ tenders, isCompany, isCity }) {
             <th>Date of Tender Close</th>
             <th>Date of Disclosing Winner</th>
             <th>Tender Status</th>
-            {(isCompany || isCity) && <th>Actions</th>}
+            {isCompany && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -65,26 +65,31 @@ function TenderList({ tenders, isCompany, isCity }) {
                 {tender.date_of_tender_winner.slice(0, 16).replace("T", " ")}
               </td>
               <td
-                style={{
-                  color: tender.tender_status === "Open" ? "green" : "black",
-                }}
+                className={`tender-status ${
+                  tender.tender_status === "Open"
+                    ? "status-open"
+                    : tender.tender_status === "Closed"
+                    ? "status-closed"
+                    : tender.tender_status === "Pending"
+                    ? "status-pending"
+                    : "status-invalid"
+                }`}
               >
                 {tender.tender_status}
               </td>
-              {(isCompany || isCity) && (
+              {isCompany && (
                 <td className="action-buttons">
-                  {isCompany && (
-                    <button
-                      className="action-btn bid-btn"
-                      onClick={() =>
-                        navigate(`/tender/${tender.tender_id}/bid`, {
-                          state: tender,
-                        })
-                      }
-                    >
-                      Bid
-                    </button>
-                  )}
+                  <button
+                    className="action-btn bid-btn"
+                    onClick={() =>
+                      navigate(`/tender/${tender.tender_id}/bid`, {
+                        state: tender,
+                      })
+                    }
+                    disabled={tender.tender_status !== "Open"}
+                  >
+                    Bid
+                  </button>
                 </td>
               )}
             </tr>

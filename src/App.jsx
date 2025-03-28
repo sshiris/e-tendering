@@ -12,8 +12,9 @@ import TenderList from "./components/TenderList/TenderList";
 import CreateTender from "./components/CreateTender/CreateTender";
 import CreateUser from "./components/CreateUser/CreateUser";
 import DetailedInfo from "./components/DetailedInfo/DetailedInfo";
-import SubmitBid from "./components/SubmitBid";
+import SubmitBid from "./components/SubmitBid/SubmitBid";
 import { ConfirmProvider } from "material-ui-confirm";
+import Home from "./components/Home/Home";
 
 import "./App.css";
 import CompanyPage from "./components/companyPage/CompanyPage";
@@ -30,12 +31,52 @@ function App() {
   useEffect(() => {
     fetchTenders();
     fetchBids();
+
+    const interval = setInterval(() => {
+      updateTenderStatus();
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, []);
+
+  const updateTenderStatus = (tendersToUpdate = tenders) => {
+    if (!tendersToUpdate || tendersToUpdate.length === 0)
+      return tendersToUpdate;
+
+    const currentDate = new Date();
+    const updatedTenders = tendersToUpdate.map((tender) => {
+      const noticeDate = new Date(tender.date_of_tender_notice);
+      const closeDate = new Date(tender.date_of_tender_close);
+
+      if (closeDate <= noticeDate) {
+        console.error(
+          `Invalid dates for tender ${tender.tender_id}: date_of_tender_close (${closeDate}) must be greater than date_of_tender_notice (${noticeDate})`
+        );
+        return { ...tender, status: "Invalid" };
+      }
+
+      let newStatus;
+      if (currentDate < noticeDate) {
+        newStatus = "Pending";
+      } else if (currentDate >= noticeDate && currentDate <= closeDate) {
+        newStatus = "Open";
+      } else {
+        newStatus = "Closed";
+      }
+
+      return { ...tender, tender_status: newStatus };
+    });
+
+    setTenders(updatedTenders);
+    return updatedTenders;
+  };
 
   const fetchTenders = async () => {
     try {
       const response = await axios.get(`${API_URL}/find`);
-      setTenders(response.data);
+      const fetchedTenders = response.data;
+      const updatedTenders = updateTenderStatus(fetchedTenders);
+      setTenders(updatedTenders);
     } catch (error) {
       console.error("Error fetching tenders:", error);
     }
@@ -59,12 +100,22 @@ function App() {
         (u) =>
           (u.email === email || u.user_id === id) && u.password === password
       );
-      if (user.email.includes("@city")) {
+
+      if (!user) {
+        throw new Error(
+          "Invalid email, user ID, or password. Please try again."
+        );
+      }
+
+      if (user.user_type === "City") {
         setIsCity(true);
         setIsCompany(false);
-      } else {
+      } else if (user.user_type === "Company") {
         setIsCity(false);
         setIsCompany(true);
+      } else {
+        setIsCity(false);
+        setIsCompany(false);
       }
       if (!user) {
         throw new Error("Invalid user. Try again");
@@ -79,10 +130,15 @@ function App() {
         address: user.address,
         user_type: user.user_type,
       });
+
       return true;
     } catch (error) {
       console.error("Login failed:", error);
-      throw error;
+      throw new Error(
+        error.response?.data?.message ||
+          error.message ||
+          "Login failed. Please try again."
+      );
     }
   };
 
@@ -107,7 +163,6 @@ function App() {
         "http://localhost:5500/create_bid",
         bidData
       );
-      // Handle success
     } catch (error) {
       console.error(
         "Error submitting bid:",
@@ -120,10 +175,11 @@ function App() {
     <Router>
       <div className="app">
         <Navbar
-          isAuthenticated={isCompany ?? isCity}
+          isAuthenticated={isCompany || isCity}
           handleLogout={handleLogout}
         />
         <Routes>
+          <Route path="/home" element={<Home />} />
           <Route
             path="/"
             element={
@@ -143,7 +199,7 @@ function App() {
                   <TenderList tenders={tenders} isCompany={isCompany} />
                 </>
               ) : (
-                <Navigate to="/login" /> // Redirect to login if not a company
+                <Navigate to="/login" />
               )
             }
           />
@@ -169,7 +225,7 @@ function App() {
           <Route
             path="/create-tender"
             element={
-              isCompany ? (
+              isCity ? (
                 <CreateTender
                   setTenders={setTenders}
                   fetchTenders={fetchTenders}
@@ -183,7 +239,7 @@ function App() {
           <Route
             path="/update-tender/:id"
             element={
-              isCompany ? (
+              isCity ? (
                 <UpdateTender
                   tenders={tenders}
                   fetchTenders={fetchTenders}
@@ -210,13 +266,13 @@ function App() {
             path="/tender/:id/bid"
             element={
               isCompany ? (
-                <SubmitBid submitBid={submitBid} user_id={user?.user_id} />
+                <SubmitBid tenders={tenders} user={user} />
               ) : (
                 <Navigate to="/login" />
               )
             }
           />
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </div>
     </Router>

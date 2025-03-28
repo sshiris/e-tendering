@@ -29,7 +29,7 @@ export default function CreateUser() {
   const determineUserType = (email) => {
     if (!email) return "Guest";
     const domain = email.split("@")[1]?.toLowerCase();
-    if (domain === "vaasa.fi") return "Admin";
+    if (domain === "vaasa.fi") return "City";
     if (domain?.startsWith("edu.") && domain.endsWith(".fi")) return "Company";
     return "Guest";
   };
