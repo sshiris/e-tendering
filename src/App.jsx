@@ -183,20 +183,14 @@ function App() {
           <Route
             path="/"
             element={
-              <TenderList
-                tenders={tenders}
-                isCompany={isCompany}
-                isCity={isCity}
-              />
-            }
-          />
-          <Route
-            path="/company"
-            element={
               isCompany ? (
                 <>
                   <CompanyPage user={user}></CompanyPage>
-                  <TenderList tenders={tenders} isCompany={isCompany} />
+                  <TenderList
+                    tenders={tenders}
+                    isCompany={isCompany}
+                    isCity={isCity}
+                  />
                 </>
               ) : (
                 <Navigate to="/login" />
