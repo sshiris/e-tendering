@@ -65,33 +65,36 @@ function SubmitBid({ tenders, user }) {
 
   if (error && !tender) {
     return (
-      <div className="submit-bid">
+      <div className="submit-bid-container">
         <h2>Error</h2>
-        <p>{error}</p>
-        <button onClick={() => navigate("/")}>Back to Tender List</button>
+        <p className="submit-bid-error">{error}</p>
+        <button className="submit-bid-cancel-btn" onClick={() => navigate("/")}>
+          Back to Tender List
+        </button>
       </div>
     );
   }
 
   if (!tender) {
     return (
-      <div className="submit-bid">
+      <div className="submit-bid-container">
         <h2>Loading...</h2>
       </div>
     );
   }
 
   return (
-    <div className="submit-bid">
+    <div className="submit-bid-container">
       <h2>Bid for {tender.tender_name}</h2>
       <p>Minimum Bid: {tender.bidding_price || "Not specified"}</p>
-      {error && <p className="error-message">{error}</p>}
+      {error && <p className="submit-bid-error">{error}</p>}
       <form onSubmit={handleSubmit}>
-        <div className="form-group">
+        <div className="submit-bid-form-group">
           <label htmlFor="amount">Bid Amount</label>
           <input
             id="amount"
             type="number"
+            className="submit-bid-input"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="Enter your bid amount"
@@ -101,12 +104,16 @@ function SubmitBid({ tenders, user }) {
             disabled={loading}
           />
         </div>
-        <button type="submit" className="submit-btn" disabled={loading}>
+        <button
+          type="submit"
+          className="submit-bid-submit-btn"
+          disabled={loading}
+        >
           {loading ? "Submitting..." : "Submit Bid"}
         </button>
       </form>
       <button
-        className="cancel-btn"
+        className="submit-bid-cancel-btn"
         onClick={() => navigate(`/`)}
         disabled={loading}
       >

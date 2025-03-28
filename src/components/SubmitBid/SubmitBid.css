@@ -1,4 +1,4 @@
-.submit-bid {
+.submit-bid-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -8,45 +8,38 @@
   padding: 20px;
 }
 
-.submit-bid h2 {
+.submit-bid-container h2 {
   font-size: 2em;
   margin-bottom: 10px;
   color: #333;
 }
 
-.submit-bid p {
+.submit-bid-container p {
   font-size: 1.2em;
   margin-bottom: 20px;
   color: #666;
 }
 
-.bid-status {
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.bid-status:contains("Bidding is open") {
-  color: #4caf50;
-}
-
-.bid-status:not(:contains("Bidding is open")) {
+.submit-bid-error {
   color: #ff4d4d;
+  margin-bottom: 15px;
+  text-align: center;
 }
 
-.form-group {
+.submit-bid-form-group {
   margin-bottom: 15px;
   width: 100%;
   max-width: 300px;
 }
 
-.form-group label {
+.submit-bid-form-group label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
   color: #333;
 }
 
-.form-group input {
+.submit-bid-input {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
@@ -54,7 +47,7 @@
   font-size: 1em;
 }
 
-.submit-btn {
+.submit-bid-submit-btn {
   background-color: #4caf50;
   color: white;
   border: none;
@@ -66,16 +59,16 @@
   margin-right: 10px;
 }
 
-.submit-btn:hover:not(:disabled) {
+.submit-bid-submit-btn:hover:not(:disabled) {
   background-color: #45a049;
 }
 
-.submit-btn:disabled {
+.submit-bid-submit-btn:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }
 
-.cancel-btn {
+.submit-bid-cancel-btn {
   background-color: #ff4d4d;
   color: white;
   border: none;
@@ -86,11 +79,11 @@
   transition: background-color 0.3s;
 }
 
-.cancel-btn:hover:not(:disabled) {
+.submit-bid-cancel-btn:hover:not(:disabled) {
   background-color: #e04343;
 }
 
-.cancel-btn:disabled {
+.submit-bid-cancel-btn:disabled {
   background-color: #cccccc;
   cursor: not-allowed;
 }
