@@ -181,6 +181,20 @@ function App() {
             }
           />
           <Route
+            path="/update-tender/:id"
+            element={
+              isCompany ? (
+                <UpdateTender
+                  tenders={tenders}
+                  fetchTenders={fetchTenders}
+                  user_id={user.user_id}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
             path="/tender/:id/details"
             element={
               <ConfirmProvider>
