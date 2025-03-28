@@ -6,6 +6,7 @@ import Category from './models/category.js'; // Import Category model
 import Tender from './models/tender.js'; // Import Tender model
 import Bid from './models/bid.js'; // Import Bid model
 import UserType from './models/userType.js'; // Import UserType model
+import UserCategory from './models/user_category.js'; // Import UserCategory model
 
 /**
  * Initialize the Express application and define the server port
@@ -110,6 +111,26 @@ app.get('/users', async (req, res) => {
   } catch (err) {
     console.error('Error fetching users:', err);
     res.status(500).json({ error: 'Error fetching users', details: err.message });
+  }
+});
+
+/**
+ * Endpoint to retrieve a user by their user_id.
+ * @route GET /users/:user_id
+ * @param {Object} req - Request object containing user_id in the parameters.
+ * @param {Object} res - Response object containing the user data.
+ */
+app.get('/users/:user_id', async (req, res) => {
+  try {
+    const { user_id } = req.params;
+    const user = await User.findOne({ user_id }).populate('categories').populate('user_type');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    res.status(500).json({ error: 'Error fetching user', details: err.message });
   }
 });
 
@@ -263,6 +284,30 @@ app.get('/check_connection', async (req, res) => {
   }
 });
 
+// Endpoint to check all collections in the database and their document counts
+/**
+ * Endpoint to check all collections in the database and their document counts.
+ * @route GET /check_all_collections
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object containing the collections and their counts.
+ */
+app.get('/check_all_collections', async (req, res) => {
+  try {
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    const collectionCounts = {};
+
+    for (const collection of collections) {
+      const count = await mongoose.connection.db.collection(collection.name).countDocuments();
+      collectionCounts[collection.name] = count;
+    }
+
+    res.json({ message: 'Collections and their counts retrieved successfully', collectionCounts });
+  } catch (err) {
+    console.error('Error checking collections:', err);
+    res.status(500).json({ error: 'Error checking collections', details: err.message });
+  }
+});
+
 // Endpoint to create collections
 /**
  * Creates database collections for User, Category, Tender, Bid, and UserType models.
@@ -277,6 +322,7 @@ app.get('/create_collections', async (req, res) => {
     await Tender.createCollection();
     await Bid.createCollection();
     await UserType.createCollection();
+    await UserCategory.createCollection(); // Assuming you have a UserCategory model
     res.json({ message: 'Collections created successfully' });
   } catch (err) {
     console.error('Error creating collections:', err);
@@ -322,27 +368,82 @@ app.get('/categories', async (req, res) => {
 
 // Endpoint to add a user to a category
 /**
- * Adds a user to a specific category by their IDs.
+ * Adds a user to specific categories by their IDs.
  * @route POST /add_user_to_category
- * @param {Object} req - The request object containing user_id and category_id in the body.
+ * @param {Object} req - The request object containing user_id and categories array in the body.
  * @param {Object} res - The response object with the status of the addition.
  */
 app.post('/add_user_to_category', async (req, res) => {
+  try {
+    const { user_id, categories } = req.body;
+    if (!user_id || !categories || !Array.isArray(categories)) {
+      return res.status(400).json({ error: 'User ID and categories array are required' });
+    }
+
+    const user = await User.findOne({ user_id });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    for (const category_id of categories) {
+      const category = await Category.findOne({ category_id });
+      if (!category) {
+        return res.status(404).json({ error: `Category with ID ${category_id} not found` });
+      }
+      if (!user.categories.includes(category._id)) {
+        user.categories.push(category._id);
+      }
+      if (!category.users.includes(user._id)) {
+        category.users.push(user._id);
+      }
+      await category.save();
+    }
+
+    await user.save();
+    res.json({ message: 'User added to categories successfully' });
+  } catch (err) {
+    console.error('Error adding user to categories:', err);
+    res.status(500).json({ error: 'Error adding user to categories', details: err.message });
+  }
+});
+
+// Endpoint to add a user to a specific category
+/**
+ * Adds a user to a specific category by their IDs.
+ * @route POST /add_user_to_specific_category
+ * @param {Object} req - The request object containing user_id and category_id in the body.
+ * @param {Object} res - The response object with the status of the addition.
+ */
+app.post('/add_user_to_specific_category', async (req, res) => {
   try {
     const { user_id, category_id } = req.body;
     if (!user_id || !category_id) {
       return res.status(400).json({ error: 'User ID and Category ID are required' });
     }
+
     const user = await User.findOne({ user_id });
     const category = await Category.findOne({ category_id });
+
     if (!user || !category) {
       return res.status(400).json({ error: 'Invalid user or category ID' });
     }
-    user.categories.push(category._id);
-    category.users.push(user._id);
-    await user.save();
-    await category.save();
-    res.json({ message: 'User added to category successfully' });
+
+    // Save the relationship in the UserCategory collection
+    const userCategory = new UserCategory({
+      user_id: user._id,
+      category_id: category._id,
+    });
+    await userCategory.save();
+
+    // Update the user's categories field
+    if (!user.categories.includes(category._id)) {
+      user.categories.push(category._id);
+      await user.save();
+    }
+
+    console.log('UserCategory relationship saved:', userCategory); // Add logging for debugging
+
+    res.json({ message: 'User added to category successfully', userCategory });
   } catch (err) {
     console.error('Error adding user to category:', err);
     res.status(500).json({ error: 'Error adding user to category', details: err.message });
@@ -371,6 +472,7 @@ app.post('/remove_user_from_category', async (req, res) => {
     category.users.pull(user._id);
     await user.save();
     await category.save();
+    
     res.json({ message: 'User removed from category successfully' });
   } catch (err) {
     console.error('Error removing user from category:', err);
@@ -438,6 +540,24 @@ app.put('/update_bid/:bid_id', async (req, res) => {
   } catch (err) {
     console.error('Error updating bid:', err);
     res.status(500).json({ error: 'Error updating bid', details: err.message });
+  }
+});
+
+/**
+ * Endpoint to retrieve all user-category relationships.
+ * @route GET /users_categories
+ * @param {Object} req - Request object.
+ * @param {Object} res - Response object containing the user-category relationships.
+ */
+app.get('/users_categories', async (req, res) => {
+  try {
+    const usersCategories = await UserCategory.find()
+      .populate('user_id', 'user_id name') // Populate user details
+      .populate('category_id', 'category_id category_name'); // Populate category details
+    res.json(usersCategories);
+  } catch (err) {
+    console.error('Error fetching user-category relationships:', err);
+    res.status(500).json({ error: 'Error fetching user-category relationships', details: err.message });
   }
 });
 

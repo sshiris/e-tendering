@@ -64,26 +64,6 @@ export default function CreateUser() {
     }
   }, [newUser.user_type, availableCategories]);
 
-  const addUserToCategory = (user_id, category_id) => {
-    fetch(`${API_URL}/add_user_to_category`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ user_id, category_id }),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("User added to category successfully:", data.message);
-      })
-      .catch((error) => console.error("Error:", error));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -95,7 +75,7 @@ export default function CreateUser() {
         return;
       }
 
-      // Проверка email перед созданием пользователя
+      // Check if email exists before creating the user
       console.log("Checking if email exists:", newUser.email);
       const emailCheckResponse = await axios.get(`${API_URL}/users?email=${newUser.email}`);
       if (emailCheckResponse.data.exists) {
@@ -103,7 +83,7 @@ export default function CreateUser() {
         return;
       }
 
-      // Создание пользователя
+      // Create the user
       console.log("Creating user...");
       const userResponse = await axios.post(`${API_URL}/create_user`, {
         name: newUser.name,
@@ -120,33 +100,33 @@ export default function CreateUser() {
         throw new Error("Failed to retrieve user_id from server response.");
       }
 
-      // Проверка перед отправкой категорий
+      // Add user to selected categories
       if (newUser.categories.length > 0) {
-        const categoryPayload = {
-          user_id: createdUserId,
-          categories: newUser.categories,
-        };
+        console.log("Adding user to categories...");
+        const categoryPromises = newUser.categories.map(async (category_id) => {
+          console.log(`Associating category_id: ${category_id} with user_id: ${createdUserId}`);
+          const response = await axios.post(`${API_URL}/add_user_to_specific_category`, {
+            user_id: createdUserId,
+            category_id,
+          });
+          console.log(`Category association response for category_id ${category_id}:`, response.data);
+          return response.data;
+        });
 
-        console.log("Sending categories payload:", categoryPayload);
         try {
-          const categoryResponse = await axios.post(`${API_URL}/user_categories`, categoryPayload);
-          console.log("Categories added successfully:", categoryResponse.data);
-
-          // Add user to each selected category
-          for (const category_id of newUser.categories) {
-            addUserToCategory(createdUserId, category_id);
-          }
+          await Promise.all(categoryPromises);
+          console.log("User added to all selected categories successfully.");
         } catch (error) {
-          console.error("Error adding categories:", error);
-
-          if (error.response?.status === 404) {
-            setError("The server endpoint for adding categories was not found. Please contact support.");
-          } else {
-            setError(error.response?.data?.error || "Failed to add categories. Please try again.");
-          }
-          return; // Stop further execution if categories fail
+          console.error("Error adding user to categories:", error);
+          setError("Failed to add user to one or more categories. Please try again.");
+          return;
         }
       }
+
+      // Fetch updated user data
+      console.log("Fetching updated user data...");
+      const updatedUserResponse = await axios.get(`${API_URL}/users/${createdUserId}`);
+      console.log("Updated user data:", updatedUserResponse.data);
 
       setUserId(createdUserId);
       setOpenDialog(true);
