@@ -64,65 +64,12 @@ function Login({ handleLogin }) {
     return value.includes("@") ? "email" : "user_id";
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-  //   setError("");
-
-  //   if (isLocked) {
-  //     setError(
-  //       `Account locked. Try again in ${Math.ceil(lockoutTime / 1000)} seconds.`
-  //     );
-  //     return;
-  //   }
-
-  //   try {
-  //     const identifierType = determineIdentifierType(identifier);
-  //     const email = identifierType === "email" ? identifier : "";
-  //     const id = identifierType === "user_id" ? identifier : "";
-
-  //     await handleLogin(email, password, id);
-
-  //     if (rememberMe) {
-  //       localStorage.setItem("rememberedIdentifier", identifier);
-  //       localStorage.setItem("rememberedIdentifierType", identifierType);
-  //       localStorage.setItem("rememberedPassword", password);
-  //     } else {
-  //       localStorage.removeItem("rememberedIdentifier");
-  //       localStorage.removeItem("rememberedIdentifierType");
-  //       localStorage.removeItem("rememberedPassword");
-  //     }
-
-  //     localStorage.setItem("loginAttempts", "0");
-  //     setLoginAttempts(0);
-  //     navigate("/tenders");
-  //   } catch (err) {
-  //     const newAttempts = loginAttempts + 1;
-  //     setLoginAttempts(newAttempts);
-  //     localStorage.setItem("loginAttempts", newAttempts.toString());
-
-  //     if (newAttempts >= 3) {
-  //       setIsLocked(true);
-  //       const lockoutStart = Date.now();
-  //       localStorage.setItem("lockoutTime", lockoutStart.toString());
-  //       setLockoutTime(5 * 60 * 1000);
-  //       setError("Too many failed attempts. Account locked for 1 minute.");
-  //     } else {
-  //       setError(
-  //         err.message || `Login failed. ${3 - newAttempts} attempts remaining.`
-  //       );
-  //     }
-  //     console.log(err.message);
-  //   }
-  // };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(""); // Reset any previous error
 
     if (isLocked) {
-      setError(
-        `Account locked. Try again in ${Math.ceil(lockoutTime / 1000)} seconds.`
-      );
+      setError(`Account locked. Try again in ${Math.ceil(lockoutTime / 1000)} seconds.`);
       return;
     }
 
@@ -143,11 +90,7 @@ function Login({ handleLogin }) {
         localStorage.removeItem("rememberedPassword");
       }
 
-      // Store additional user data in localStorage
-      localStorage.setItem("user_id", user.user_id);
-      localStorage.setItem("name", user.name);
-      localStorage.setItem("email", user.email);
-
+      // Reset login attempts and redirect
       localStorage.setItem("loginAttempts", "0");
       setLoginAttempts(0);
       navigate("/tenders"); // Redirect after successful login
@@ -160,12 +103,10 @@ function Login({ handleLogin }) {
         setIsLocked(true);
         const lockoutStart = Date.now();
         localStorage.setItem("lockoutTime", lockoutStart.toString());
-        setLockoutTime(5 * 60 * 1000); // Account locked for 1 minute
-        setError("Too many failed attempts. Account locked for 1 minute.");
+        setLockoutTime(5 * 60 * 1000); // Account locked for 5 minutes
+        setError("Too many failed attempts. Account locked for 5 minutes.");
       } else {
-        setError(
-          err.message || `Login failed. ${3 - newAttempts} attempts remaining.`
-        );
+        setError(err.message || `Login failed. ${3 - newAttempts} attempts remaining.`);
       }
     }
   };
@@ -177,7 +118,6 @@ function Login({ handleLogin }) {
   return (
     <div className="login-container">
       <h2 className="heading">Login</h2>
-
       {error && <div className="error-message">{error}</div>}
 
       <form onSubmit={handleSubmit} className="login-form">
@@ -193,7 +133,6 @@ function Login({ handleLogin }) {
             disabled={isLocked}
           />
         </div>
-
         <div className="form-group">
           <label htmlFor="password">Password</label>
           <input
@@ -206,7 +145,6 @@ function Login({ handleLogin }) {
             disabled={isLocked}
           />
         </div>
-
         <div className="forgot-password-container">
           <a
             className="forgot-password"
@@ -217,11 +155,9 @@ function Login({ handleLogin }) {
             Forgot password?
           </a>
         </div>
-
         <button type="submit" className="login-button" disabled={isLocked}>
           Login
         </button>
-
         <div className="footer">
           <label className="remember-me">
             <input
@@ -233,7 +169,6 @@ function Login({ handleLogin }) {
             />
             Remember me
           </label>
-
           <button
             type="button"
             className="cancel-btn"
@@ -242,7 +177,6 @@ function Login({ handleLogin }) {
             Cancel
           </button>
         </div>
-
         <div className="register-container">
           <p>
             Don’t have an account?{" "}
