@@ -7,6 +7,7 @@ import Tender from './models/tender.js'; // Import Tender model
 import Bid from './models/bid.js'; // Import Bid model
 import UserType from './models/userType.js'; // Import UserType model
 import UserCategory from './models/user_category.js'; // Import UserCategory model
+import Feedback from './models/feedback.js'; // Import Feedback model
 
 /**
  * Initialize the Express application and define the server port
@@ -558,6 +559,45 @@ app.get('/users_categories', async (req, res) => {
   } catch (err) {
     console.error('Error fetching user-category relationships:', err);
     res.status(500).json({ error: 'Error fetching user-category relationships', details: err.message });
+  }
+});
+
+// Endpoint to fetch feedback
+/**
+ * Fetches feedback for a specific user or all feedbacks if no user_id is provided.
+ * @route GET /feedback
+ * @param {Object} req - The request object containing user_id in the query.
+ * @param {Object} res - The response object containing the feedback.
+ */
+app.get('/feedback', async (req, res) => {
+  try {
+    const { user_id } = req.query;
+    const feedback = user_id
+      ? await Feedback.find({ user_id })
+      : await Feedback.find();
+    res.json(feedback);
+  } catch (err) {
+    console.error('Error fetching feedback:', err);
+    res.status(500).json({ error: 'Error fetching feedback', details: err.message });
+  }
+});
+
+// Endpoint to submit feedback
+/**
+ * Submits feedback for a specific user and tender.
+ * @route POST /submit_feedback
+ * @param {Object} req - The request object containing user_id, tender_id, and feedback in the body.
+ * @param {Object} res - The response object with the status of the submission.
+ */
+app.post('/submit_feedback', async (req, res) => {
+  try {
+    const { user_id, tender_id, feedback } = req.body;
+    const newFeedback = new Feedback({ user_id, tender_id, message: feedback });
+    await newFeedback.save();
+    res.json({ message: 'Feedback submitted successfully' });
+  } catch (err) {
+    console.error('Error submitting feedback:', err);
+    res.status(500).json({ error: 'Error submitting feedback', details: err.message });
   }
 });
 
