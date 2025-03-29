@@ -595,8 +595,19 @@ app.get('/feedback', async (req, res) => {
 app.post('/submit_feedback', async (req, res) => {
   try {
     const { user_id, tender_id, feedback } = req.body;
+
+    // Validate required fields
+    if (!user_id || !feedback) {
+      return res.status(400).json({ error: 'User ID and feedback are required.' });
+    }
+
+    // Log the request body for debugging
+    console.log('Submitting feedback:', { user_id, tender_id, feedback });
+
+    // Create and save the feedback
     const newFeedback = new Feedback({ user_id, tender_id, message: feedback });
     await newFeedback.save();
+
     res.json({ message: 'Feedback submitted successfully' });
   } catch (err) {
     console.error('Error submitting feedback:', err);
