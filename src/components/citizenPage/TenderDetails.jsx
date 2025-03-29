@@ -71,5 +71,6 @@ const TenderDetails = () => {
     </div>
   );
 };
-
+// This component fetches and displays the details of a specific tender based on the ID passed in the URL parameters. It handles loading and error states, and displays relevant information about the tender, including its status, bidding price, and competing companies or winner.
+// It uses React Router's useParams to extract the tender ID from the URL, and Axios to fetch data from the server. The component is styled using Tailwind CSS classes.
 export default TenderDetails;
