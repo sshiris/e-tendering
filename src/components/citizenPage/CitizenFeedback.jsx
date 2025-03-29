@@ -3,7 +3,7 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 import "./CitizenFeedback.css";
 
-const CitizenFeedback = () => {
+const CitizenFeedback = ({ user }) => {
   const [tender, setTender] = useState(null);
   const [feedbackList, setFeedbackList] = useState([]);
   const [feedback, setFeedback] = useState("");
@@ -41,10 +41,16 @@ const CitizenFeedback = () => {
     e.preventDefault();
     try {
       if (!feedback.trim()) throw new Error("Feedback cannot be empty.");
+
+      // Log the data being sent for debugging
+      console.log('Submitting feedback:', { user_id: user.user_id, feedback });
+
       await axios.post(`${API_URL}/submit_feedback`, {
+        user_id: user.user_id,
         tender_id,
         feedback,
       });
+
       setFeedback("");
       // Refresh feedback list
       const feedbackResponse = await axios.get(`${API_URL}/feedback`, {
@@ -52,7 +58,8 @@ const CitizenFeedback = () => {
       });
       setFeedbackList(feedbackResponse.data);
     } catch (err) {
-      setError(err.message || "Failed to submit feedback.");
+      console.error("Error submitting feedback:", err);
+      setError(err.response?.data?.error || "Failed to submit feedback.");
     }
   };
 
