@@ -19,10 +19,19 @@ import Home from "./components/Home/Home";
 import "./App.css";
 import CompanyPage from "./components/companyPage/CompanyPage";
 import CompanyBids from "./components/companyBids/CompanyBids";
+import UpdateTender from "./components/UpdateTender/UpdateTender";
+import CitizenPage from "./components/citizenPage/CitizenPage";
+import CitizenFeedback from "./components/citizenPage/CitizenFeedback";
+import ViewFeedback from "./components/citizenPage/ViewFeedback";
+import OpenTenders from "./components/citizenPage/OpenTenders";
+import ClosedTenders from "./components/citizenPage/ClosedTenders";
+import AllFeedbacks from "./components/citizenPage/AllFeedbacks";
+import TenderDetails from "./components/citizenPage/TenderDetails";
 
 function App() {
   const [isCompany, setIsCompany] = useState(false);
   const [isCity, setIsCity] = useState(false);
+  const [isCitizen, setIsCitizen] = useState(false);
   const [user, setUser] = useState(null);
   const [tenders, setTenders] = useState([]);
   const [bids, setBids] = useState([]);
@@ -110,10 +119,13 @@ function App() {
       if (user.user_type === "City") {
         setIsCity(true);
         setIsCompany(false);
+        setIsCitizen(false);
       } else if (user.user_type === "Company") {
         setIsCity(false);
         setIsCompany(true);
+        setIsCitizen(false);
       } else {
+        setIsCitizen(true);
         setIsCity(false);
         setIsCompany(false);
       }
@@ -175,7 +187,7 @@ function App() {
     <Router>
       <div className="app">
         <Navbar
-          isAuthenticated={isCompany || isCity}
+          isAuthenticated={isCompany || isCity || isCitizen}
           handleLogout={handleLogout}
         />
         <Routes>
@@ -190,8 +202,11 @@ function App() {
                     tenders={tenders}
                     isCompany={isCompany}
                     isCity={isCity}
+                    isCitizen={isCitizen}
                   />
                 </>
+              ) : isCitizen ? (
+                <CitizenPage user={user} />
               ) : (
                 <Navigate to="/login" />
               )
@@ -208,8 +223,8 @@ function App() {
           <Route
             path="/login"
             element={
-              isCompany ? (
-                <Navigate to="/company" />
+              isCompany || isCitizen ? (
+                <Navigate to="/" />
               ) : (
                 <Login handleLogin={handleLogin} />
               )
@@ -266,6 +281,66 @@ function App() {
               )
             }
           />
+          <Route
+            path="/citizen/feedback"
+            element={
+              isCitizen ? (
+                <CitizenFeedback user={user} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/citizen/view-feedback"
+            element={
+              isCitizen ? (
+                <ViewFeedback user={user} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/citizen/open-tenders"
+            element={
+              isCitizen ? (
+                <OpenTenders tenders={tenders} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/citizen/closed-tenders"
+            element={
+              isCitizen ? (
+                <ClosedTenders tenders={tenders} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/citizen/all-feedbacks"
+            element={
+              isCitizen ? (
+                <AllFeedbacks />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/citizen/tender-details/:id"
+            element={
+              isCitizen ? (
+                <TenderDetails />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
           <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </div>
@@ -274,4 +349,4 @@ function App() {
 }
 
 export default App;
-export { App };   
+export { App };

@@ -1,0 +1,88 @@
+Here is the UML diagram representation of the current database relationships based on the provided schema and descriptions:
+
+### UML Diagram (Text Representation)
+
+```
++----------------+       1..M       +----------------+
+|     USER       |---------------->|     BID         |
++----------------+                  +----------------+
+| user_id (PK)   |                  | bid_id (PK)    |
+| name           |                  | amount         |
+| address        |                  | date           |
+| user_type      |                  | user (FK)      |
+| email          |                  | tender (FK)    |
+| categories (FK)|                  +----------------+
+| tenders (FK)   |
+| bids (FK)      |
++----------------+
+
++----------------+       1..M       +----------------+
+|     TENDER     |---------------->|     BID         |
++----------------+                  +----------------+
+| tender_id (PK) |                  | bid_id (PK)    |
+| tender_name    |                  | amount         |
+| description    |                  | date           |
+| construction_from|                | user (FK)      |
+| construction_to|                  | tender (FK)    |
+| date_of_notice |                  +----------------+
+| date_of_close  |
+| bidding_price  |
+| tender_status  |
+| staff_id       |
+| winner (FK)    |
+| bids (FK)      |
++----------------+
+
++----------------+       1..M       +----------------+
+|    CATEGORY    |---------------->| USER_CATEGORY   |
++----------------+                  +----------------+
+| category_id (PK)|                 | user_id (FK)   |
+| category_name  |                  | category_id (FK)|
+| users (FK)     |                  +----------------+
++----------------+
+
++----------------+       1..M       +----------------+
+|    USER        |---------------->| USER_CATEGORY   |
++----------------+                  +----------------+
+| user_id (PK)   |                  | user_id (FK)   |
+| ...            |                  | category_id (FK)|
++----------------+                  +----------------+
+
++----------------+       1..M       +----------------+
+|    USER        |---------------->| FEEDBACK        |
++----------------+                  +----------------+
+| user_id (PK)   |                  | feedback_id (PK)|
+| ...            |                  | user_id (FK)   |
+|                |                  | tender_id (FK) |
+|                |                  | message        |
+|                |                  | created_at     |
++----------------+                  +----------------+
+```
+
+### Explanation of Relationships:
+1. **USER ↔ BID**:  
+   - A `USER` can have multiple `BID`s (1..M relationship).
+   - Each `BID` is associated with one `USER`.
+
+2. **TENDER ↔ BID**:  
+   - A `TENDER` can have multiple `BID`s (1..M relationship).
+   - Each `BID` is associated with one `TENDER`.
+
+3. **USER ↔ CATEGORY** (via USER_CATEGORY):  
+   - A `USER` can belong to multiple `CATEGORY`s (M..M relationship).
+   - A `CATEGORY` can have multiple `USER`s.
+   - This is implemented through the `USER_CATEGORY` join table.
+
+4. **USER ↔ FEEDBACK**:  
+   - A `USER` can submit multiple `FEEDBACK`s (1..M relationship).
+   - Each `FEEDBACK` is associated with one `USER`.
+
+5. **TENDER ↔ FEEDBACK**:  
+   - A `FEEDBACK` can optionally be associated with a `TENDER` (0..1 relationship).
+
+6. **TENDER ↔ USER (Winner)**:  
+   - A `TENDER` can have one `USER` as the winner (0..1 relationship).
+
+---
+
+If you need a visual diagram, you can use tools like [draw.io](https://app.diagrams.net/) or any UML diagramming software to create this structure.
