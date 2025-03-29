@@ -31,6 +31,12 @@ const OpenTenders = ({ tenders }) => {
           </li>
         ))}
       </ul>
+      <button
+        onClick={() => navigate("/")}
+        className="mt-6 px-4 py-2 bg-green-600 text-white font-semibold rounded hover:bg-green-700 transition"
+      >
+        Back
+      </button>
     </div>
   );
 };
