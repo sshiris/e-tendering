@@ -22,20 +22,6 @@ const CitizenPage = ({ user }) => {
       >
         View Closed Tenders
       </button>
-
-      <button
-        onClick={() => navigate("/citizen/all-feedbacks")}
-        className="mt-4 ml-4 px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition"
-      >
-        View All Feedbacks
-      </button>
-
-      <button
-        onClick={() => navigate("/citizen/view-feedback")}
-        className="mt-4 ml-4 px-4 py-2 bg-yellow-600 text-white font-semibold rounded hover:bg-yellow-700 transition"
-      >
-        View Feedback
-      </button>
     </div>
   );
 };
