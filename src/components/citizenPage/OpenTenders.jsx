@@ -22,6 +22,12 @@ const OpenTenders = ({ tenders }) => {
             >
               Provide Feedback
             </button>
+            <button
+              onClick={() => navigate(`/citizen/tender-details/${tender.tender_id}`)}
+              className="mt-2 px-4 py-2 bg-gray-600 text-white font-semibold rounded hover:bg-gray-700 transition"
+            >
+              More
+            </button>
           </li>
         ))}
       </ul>

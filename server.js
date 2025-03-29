@@ -67,13 +67,16 @@ app.post('/save_tender', (req, res) => {
  * @param {Object} req - Request object.
  * @param {Object} res - Response object containing the list of tenders.
  */
-app.get('/find', (req, res) => {
-  Tender.find()
-    .then(tenders => res.json(tenders))
-    .catch((err) => {
-      console.error('Error fetching tenders:', err);
-      res.status(500).json({ error: 'Error fetching tenders', details: err });
-    });
+app.get('/find', async (req, res) => {
+  try {
+    const tenders = await Tender.find()
+      .populate('bids') // Populate related bids
+      .populate('winner', 'name'); // Populate winner's name
+    res.json(tenders);
+  } catch (err) {
+    console.error('Error fetching tenders:', err);
+    res.status(500).json({ error: 'Error fetching tenders', details: err.message });
+  }
 });
 
 /**

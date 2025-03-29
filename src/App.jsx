@@ -26,6 +26,7 @@ import ViewFeedback from "./components/citizenPage/ViewFeedback";
 import OpenTenders from "./components/citizenPage/OpenTenders";
 import ClosedTenders from "./components/citizenPage/ClosedTenders";
 import AllFeedbacks from "./components/citizenPage/AllFeedbacks";
+import TenderDetails from "./components/citizenPage/TenderDetails";
 
 function App() {
   const [isCompany, setIsCompany] = useState(false);
@@ -325,6 +326,16 @@ function App() {
             element={
               isCitizen ? (
                 <AllFeedbacks />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/citizen/tender-details/:id"
+            element={
+              isCitizen ? (
+                <TenderDetails />
               ) : (
                 <Navigate to="/login" />
               )
