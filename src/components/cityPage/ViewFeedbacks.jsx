@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router";
 import axios from "axios";
 import "./ViewFeedbacks.css";
 
@@ -9,6 +10,7 @@ const ViewFeedbacks = () => {
   const [sortBy, setSortBy] = useState("newest");
   const [filter, setFilter] = useState("all");
   const API_URL = "http://localhost:5500";
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchAllFeedback = async () => {
@@ -183,7 +185,6 @@ const ViewFeedbacks = () => {
                         {feedback.category}
                       </span>
                     )}
-
                     {feedback.sentiment && (
                       <span
                         className={`feedback-tag sentiment ${feedback.sentiment}`}
@@ -205,6 +206,14 @@ const ViewFeedbacks = () => {
           <button className="pagination-button next">Next</button>
         </div>
       )}
+      <div className="mb-6">
+        <button
+          onClick={() => navigate("/city/dashboard")}
+          className="px-4 py-2 bg-gray-600 text-white font-semibold rounded hover:bg-gray-700 transition duration-200"
+        >
+          Go Back to City Dashboard
+        </button>
+      </div>
     </div>
   );
 };

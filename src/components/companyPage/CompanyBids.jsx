@@ -9,37 +9,35 @@ const CompanyBids = ({ user }) => {
   const API_URL = "http://localhost:5500";
 
   useEffect(() => {
-    fetchBids(); // Fetch bids when the component mounts
+    fetchBids();
   }, []);
 
   const fetchBids = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
       const response = await axios.get(`${API_URL}/bids`);
       const allBids = response.data;
 
-      // Filter bids for this user and ensure the tender is not null
       if (!Array.isArray(allBids)) {
         throw new Error("Expected an array of bids.");
       }
 
-      // Filter bids for this user (using user.user_id)
       const userBids = allBids.filter(
         (bid) =>
           bid.user && bid.user.user_id === user.user_id && bid.tender !== null
       );
 
-      setBids(userBids); // Set the filtered bids
-      setLoading(false); // Finish loading
+      setBids(userBids);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching bids:", error);
       setError("Error fetching bids, please try again.");
-      setLoading(false); // Stop loading in case of an error
+      setLoading(false);
     }
   };
 
-  if (loading) return <div>Loading...</div>; // Loading state
-  if (error) return <div>{error}</div>; // Error state
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div>
@@ -53,27 +51,22 @@ const CompanyBids = ({ user }) => {
               <p>
                 <strong>Tender Name:</strong> {bid.tender.tender_name}
               </p>{" "}
-              {/* Access populated tender_name */}
               <p>
                 <strong>Tender Description:</strong> {bid.tender.description}
               </p>{" "}
-              {/* Access populated description */}
               <p>
                 <strong>Bid Amount:</strong> {bid.amount}
               </p>
               <p>
                 <strong>Submitted by:</strong> {bid.user.name}
               </p>{" "}
-              {/* Access populated user name */}
               <p>
                 <strong>User Email:</strong> {bid.user.email}
               </p>{" "}
-              {/* Access populated user email */}
               <p>
                 <strong>Submitted on:</strong>{" "}
                 {new Date(bid.date).toLocaleDateString()}
               </p>{" "}
-              {/* Bid submission date */}
             </li>
           ))}
         </ul>

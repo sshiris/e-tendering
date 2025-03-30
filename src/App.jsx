@@ -17,7 +17,7 @@ import { ConfirmProvider } from "material-ui-confirm";
 import Home from "./components/Home/Home";
 import "./App.css";
 import CompanyPage from "./components/companyPage/CompanyPage";
-import CompanyBids from "./components/companyBids/CompanyBids";
+import CompanyBids from "./components/companyPage/CompanyBids";
 import UpdateTender from "./components/UpdateTender/UpdateTender";
 import CitizenPage from "./components/citizenPage/CitizenPage";
 import CitizenFeedback from "./components/citizenPage/CitizenFeedback";
