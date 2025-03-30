@@ -15,7 +15,6 @@ import DetailedInfo from "./components/DetailedInfo/DetailedInfo";
 import SubmitBid from "./components/SubmitBid/SubmitBid";
 import { ConfirmProvider } from "material-ui-confirm";
 import Home from "./components/Home/Home";
-
 import "./App.css";
 import CompanyPage from "./components/companyPage/CompanyPage";
 import CompanyBids from "./components/companyBids/CompanyBids";
@@ -27,15 +26,27 @@ import OpenTenders from "./components/citizenPage/OpenTenders";
 import ClosedTenders from "./components/citizenPage/ClosedTenders";
 import AllFeedbacks from "./components/citizenPage/AllFeedbacks";
 import TenderDetails from "./components/citizenPage/TenderDetails";
+import CityPage from "./components/cityPage/cityPage";
+import AdminPage from "./components/adminPage/AdminPage";
 
 function App() {
   const [isCompany, setIsCompany] = useState(false);
   const [isCity, setIsCity] = useState(false);
   const [isCitizen, setIsCitizen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [canAccessAdminPage, setCanAccessAdminPage] = useState(false);
   const [user, setUser] = useState(null);
   const [tenders, setTenders] = useState([]);
   const [bids, setBids] = useState([]);
   const API_URL = "http://localhost:5500";
+
+  const ADMIN_CREDENTIALS = [
+    {
+      email: "admin@admin.com",
+      password: "admin123",
+      canAccessAdminPage: true,
+    },
+  ];
 
   useEffect(() => {
     fetchTenders();
@@ -105,18 +116,32 @@ function App() {
       const response = await axios.get(`${API_URL}/users`);
       const users = response.data;
 
-      const user = users.find(
+      let user = users.find(
         (u) =>
           (u.email === email || u.user_id === id) && u.password === password
       );
 
-      if (!user) {
+      const adminCred = ADMIN_CREDENTIALS.find(
+        (admin) => admin.email === email && admin.password === password
+      );
+      const isAdminUser = !!adminCred;
+      const adminPageAccess = adminCred?.canAccessAdminPage || false;
+
+      if (!user && !isAdminUser) {
         throw new Error(
           "Invalid email, user ID, or password. Please try again."
         );
       }
 
-      if (user.user_type === "City") {
+      if (isAdminUser && !user) {
+        user = adminCred;
+      }
+
+      setIsAdmin(isAdminUser);
+      setCanAccessAdminPage(adminPageAccess);
+
+      if (isAdminUser) {
+      } else if (user.user_type === "City") {
         setIsCity(true);
         setIsCompany(false);
         setIsCitizen(false);
@@ -124,23 +149,31 @@ function App() {
         setIsCity(false);
         setIsCompany(true);
         setIsCitizen(false);
-      } else {
+      } else if (user.user_type === "Citizen") {
         setIsCitizen(true);
         setIsCity(false);
         setIsCompany(false);
-      }
-      if (!user) {
-        throw new Error("Invalid user. Try again");
+      } else {
+        throw new Error("Invalid user type.");
       }
 
       localStorage.setItem("user", JSON.stringify(user));
 
       setUser({
+        _id: user._id,
         user_id: user.user_id,
         name: user.name,
         email: user.email,
         address: user.address,
         user_type: user.user_type,
+        password: user.password,
+        lock: user.lock || false,
+        categories: user.categories || [],
+        tenders: user.tenders || [],
+        bids: user.bids || [],
+        __v: user.__v || 0,
+        isAdmin: isAdminUser,
+        canAccessAdminPage: adminPageAccess,
       });
 
       return true;
@@ -157,38 +190,21 @@ function App() {
   const handleLogout = () => {
     setIsCompany(false);
     setIsCity(false);
+    setIsCitizen(false);
+    setIsAdmin(false);
+    setCanAccessAdminPage(false);
     setUser(null);
-  };
-
-  const submitBid = async (tender_id, amount, user_id) => {
-    const bidData = {
-      amount: amount,
-      user_id: user_id,
-      tender_id: tender_id,
-    };
-    console.log("Bid Data:", bidData);
-    console.log("User ID:", user_id);
-    console.log("Tender ID:", tender_id);
-
-    try {
-      const response = await axios.post(
-        "http://localhost:5500/create_bid",
-        bidData
-      );
-    } catch (error) {
-      console.error(
-        "Error submitting bid:",
-        error.response?.data || error.message
-      );
-    }
+    localStorage.removeItem("user");
   };
 
   return (
     <Router>
       <div className="app">
         <Navbar
-          isAuthenticated={isCompany || isCity || isCitizen}
+          isAuthenticated={isCompany || isCity || isCitizen || isAdmin}
           handleLogout={handleLogout}
+          userType={user?.user_type}
+          isAdmin={isAdmin}
         />
         <Routes>
           <Route path="/home" element={<Home />} />
@@ -197,7 +213,17 @@ function App() {
             element={
               isCompany ? (
                 <>
-                  <CompanyPage user={user}></CompanyPage>
+                  <CompanyPage user={user} />
+                  <TenderList
+                    tenders={tenders}
+                    isCompany={isCompany}
+                    isCity={isCity}
+                    isCitizen={isCitizen}
+                  />
+                </>
+              ) : isCity ? (
+                <>
+                  <CityPage user={user} />
                   <TenderList
                     tenders={tenders}
                     isCompany={isCompany}
@@ -214,6 +240,17 @@ function App() {
           />
 
           <Route
+            path="/admin"
+            element={
+              canAccessAdminPage ? (
+                <AdminPage user={user} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+
+          <Route
             path="/company/bids"
             element={
               isCompany ? <CompanyBids user={user} /> : <Navigate to="/login" />
@@ -223,14 +260,16 @@ function App() {
           <Route
             path="/login"
             element={
-              isCompany || isCitizen ? (
+              isCompany || isCity || isCitizen || isAdmin ? (
                 <Navigate to="/" />
               ) : (
-                <Login handleLogin={handleLogin} />
+                <Login handleLogin={handleLogin} isAdmin={isAdmin} />
               )
             }
           />
+
           <Route path="/create-user" element={<CreateUser />} />
+
           <Route
             path="/create-tender"
             element={
@@ -238,7 +277,7 @@ function App() {
                 <CreateTender
                   setTenders={setTenders}
                   fetchTenders={fetchTenders}
-                  user_id={user.user_id}
+                  user_id={user?.user_id}
                 />
               ) : (
                 <Navigate to="/login" />
@@ -252,13 +291,14 @@ function App() {
                 <UpdateTender
                   tenders={tenders}
                   fetchTenders={fetchTenders}
-                  user_id={user.user_id}
+                  user_id={user?.user_id}
                 />
               ) : (
                 <Navigate to="/login" />
               )
             }
           />
+
           <Route
             path="/tender/:id/details"
             element={
@@ -281,6 +321,7 @@ function App() {
               )
             }
           />
+
           <Route
             path="/citizen/feedback"
             element={
@@ -323,24 +364,13 @@ function App() {
           />
           <Route
             path="/citizen/all-feedbacks"
-            element={
-              isCitizen ? (
-                <AllFeedbacks />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={isCitizen ? <AllFeedbacks /> : <Navigate to="/login" />}
           />
           <Route
             path="/citizen/tender-details/:id"
-            element={
-              isCitizen ? (
-                <TenderDetails />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={isCitizen ? <TenderDetails /> : <Navigate to="/login" />}
           />
+
           <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </div>

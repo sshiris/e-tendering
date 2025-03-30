@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
-function Login({ handleLogin }) {
+function Login({ handleLogin, isAdmin, canAccessAdminPage }) {
   const navigate = useNavigate();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -37,14 +37,19 @@ function Login({ handleLogin }) {
         setLoginAttempts(0);
       }
     }
-  }, []);
+
+    // Redirect to /admin if already authenticated with admin page access
+    if (canAccessAdminPage) {
+      navigate("/admin");
+    }
+  }, [canAccessAdminPage, navigate]);
 
   useEffect(() => {
     if (isLocked && lockoutTime) {
       const timer = setInterval(() => {
         const timeLeft =
           parseInt(localStorage.getItem("lockoutTime"), 10) +
-          5 * 60 * 1000 -
+          60 * 1000 -
           Date.now();
         if (timeLeft <= 0) {
           setIsLocked(false);
@@ -66,10 +71,12 @@ function Login({ handleLogin }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(""); // Reset any previous error
+    setError("");
 
     if (isLocked) {
-      setError(`Account locked. Try again in ${Math.ceil(lockoutTime / 1000)} seconds.`);
+      setError(
+        `Account locked. Try again in ${Math.ceil(lockoutTime / 1000)} seconds.`
+      );
       return;
     }
 
@@ -78,22 +85,24 @@ function Login({ handleLogin }) {
       const email = identifierType === "email" ? identifier : "";
       const id = identifierType === "user_id" ? identifier : "";
 
-      // Assuming handleLogin will set the user information and also check credentials
-      await handleLogin(email, password, id);
+      const success = await handleLogin(email, password, id);
 
-      // Store the user data in localStorage after successful login
-      if (rememberMe) {
-        localStorage.setItem("rememberedIdentifier", identifier);
-        localStorage.setItem("rememberedPassword", password);
-      } else {
-        localStorage.removeItem("rememberedIdentifier");
-        localStorage.removeItem("rememberedPassword");
+      if (success) {
+        if (rememberMe) {
+          localStorage.setItem("rememberedIdentifier", identifier);
+          localStorage.setItem("rememberedPassword", password);
+        } else {
+          localStorage.removeItem("rememberedIdentifier");
+          localStorage.removeItem("rememberedPassword");
+        }
+
+        localStorage.setItem("loginAttempts", "0");
+        setLoginAttempts(0);
+
+        const user = JSON.parse(localStorage.getItem("user") || "{}");
+        const hasAdminPageAccess = user.canAccessAdminPage || false;
+        navigate(hasAdminPageAccess ? "/admin" : "/");
       }
-
-      // Reset login attempts and redirect
-      localStorage.setItem("loginAttempts", "0");
-      setLoginAttempts(0);
-      navigate("/tenders"); // Redirect after successful login
     } catch (err) {
       const newAttempts = loginAttempts + 1;
       setLoginAttempts(newAttempts);
@@ -103,10 +112,12 @@ function Login({ handleLogin }) {
         setIsLocked(true);
         const lockoutStart = Date.now();
         localStorage.setItem("lockoutTime", lockoutStart.toString());
-        setLockoutTime(5 * 60 * 1000); // Account locked for 5 minutes
-        setError("Too many failed attempts. Account locked for 5 minutes.");
+        setLockoutTime(60 * 1000);
+        setError("Too many failed attempts. Account locked for 1 minute.");
       } else {
-        setError(err.message || `Login failed. ${3 - newAttempts} attempts remaining.`);
+        setError(
+          err.message || `Login failed. ${3 - newAttempts} attempts remaining.`
+        );
       }
     }
   };
@@ -131,6 +142,7 @@ function Login({ handleLogin }) {
             placeholder="Enter your email or user ID"
             required
             disabled={isLocked}
+            className="input-field"
           />
         </div>
         <div className="form-group">
@@ -143,6 +155,7 @@ function Login({ handleLogin }) {
             placeholder="Enter your password"
             required
             disabled={isLocked}
+            className="input-field"
           />
         </div>
         <div className="forgot-password-container">
@@ -156,7 +169,7 @@ function Login({ handleLogin }) {
           </a>
         </div>
         <button type="submit" className="login-button" disabled={isLocked}>
-          Login
+          {isLocked ? "Locked" : "Login"}
         </button>
         <div className="footer">
           <label className="remember-me">

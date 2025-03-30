@@ -4,7 +4,12 @@ import axios from "axios";
 import "./DetailedInfo.css";
 import { useConfirm } from "material-ui-confirm";
 
-export default function DetailedTenderInfo({ tenders, fetchTenders, isCity, user }) {
+export default function DetailedTenderInfo({
+  tenders,
+  fetchTenders,
+  isCity,
+  user,
+}) {
   const confirm = useConfirm();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -97,9 +102,6 @@ export default function DetailedTenderInfo({ tenders, fetchTenders, isCity, user
           <p>
             <strong>Staff ID:</strong> {tender.staff_id}
           </p>
-        </div>
-        <div>
-          <a href="">Bidding List</a>
         </div>
         <div className="actions">
           {isCity && (
