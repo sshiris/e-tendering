@@ -25,7 +25,6 @@ import CitizenFeedback from "./components/citizenPage/CitizenFeedback";
 import ViewFeedback from "./components/citizenPage/ViewFeedback";
 import OpenTenders from "./components/citizenPage/OpenTenders";
 import ClosedTenders from "./components/citizenPage/ClosedTenders";
-import AllFeedbacks from "./components/citizenPage/AllFeedbacks";
 import TenderDetails from "./components/citizenPage/TenderDetails";
 import CityPage from "./components/cityPage/CityPage";
 import ManageCategories from "./components/cityPage/ManageCategories"; // Import the new component
@@ -38,12 +37,12 @@ function App() {
   const [isCitizen, setIsCitizen] = useState(false);
   const [user, setUser] = useState(null);
   const [tenders, setTenders] = useState([]);
-  const [bids, setBids] = useState([]);
+  // Removed unused 'bids' state variable
   const API_URL = "http://localhost:5500";
 
   useEffect(() => {
     fetchTenders();
-    fetchBids();
+    // Removed fetchBids call as 'bids' state is no longer used
 
     const interval = setInterval(() => {
       updateTenderStatus();
@@ -95,14 +94,7 @@ function App() {
     }
   };
 
-  const fetchBids = async () => {
-    try {
-      const response = await axios.get(`${API_URL}/bids`);
-      setBids(response.data);
-    } catch (error) {
-      console.error("Error fetching bids:", error);
-    }
-  };
+  // Removed fetchBids function as 'bids' state is no longer used
 
   const handleLogin = async (email, password, id) => {
     try {
@@ -320,16 +312,6 @@ function App() {
             element={
               isCitizen ? (
                 <ClosedTenders tenders={tenders} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-          <Route
-            path="/citizen/all-feedbacks"
-            element={
-              isCitizen ? (
-                <AllFeedbacks />
               ) : (
                 <Navigate to="/login" />
               )

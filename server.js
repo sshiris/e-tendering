@@ -25,7 +25,7 @@ app.use(express.json()); // Parse JSON bodies
  * MongoDB connection string.
  * Replace with the appropriate URI for your MongoDB instance.
  */
-const uri = "mongodb+srv://storeDataUser:g1MfHieubCImPSXV@cluster0.noqzo.mongodb.net/e-Tendering?retryWrites=true&w=majority";
+const uri = process.env.MONGODB_URI || "mongodb+srv://storeDataUser:g1MfHieubCImPSXV@cluster0.noqzo.mongodb.net/e-Tendering?retryWrites=true&w=majority";
 
 /**
  * Connect to MongoDB using Mongoose.
@@ -36,14 +36,6 @@ mongoose.connect(uri)
     console.error('Failed to connect to MongoDB Atlas:', err.message);
     console.error(err.stack); // Optional: Log stack trace for debugging
   });
-
-/**
- * Error logging middleware to handle unhandled errors in the application.
- */
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something broke!');
-});
 
 /**
  * Endpoint to save a tender.
@@ -394,10 +386,10 @@ app.post('/add_user_to_category', async (req, res) => {
       if (!category) {
         return res.status(404).json({ error: `Category with ID ${category_id} not found` });
       }
-      if (!user.categories.includes(category._id)) {
+      if (!user.categories?.includes(category._id)) {
         user.categories.push(category._id);
       }
-      if (!category.users.includes(user._id)) {
+      if (!category.users?.includes(user._id)) {
         category.users.push(user._id);
       }
       await category.save();
@@ -432,6 +424,16 @@ app.post('/add_user_to_specific_category', async (req, res) => {
       return res.status(400).json({ error: 'Invalid user or category ID' });
     }
 
+    // Check if the relationship already exists
+    const existingRelationship = await UserCategory.findOne({
+      user_id: user._id,
+      category_id: category._id,
+    });
+
+    if (existingRelationship) {
+      return res.status(400).json({ error: 'User is already in this category' });
+    }
+
     // Save the relationship in the UserCategory collection
     const userCategory = new UserCategory({
       user_id: user._id,
@@ -440,7 +442,7 @@ app.post('/add_user_to_specific_category', async (req, res) => {
     await userCategory.save();
 
     // Update the user's categories field
-    if (!user.categories.includes(category._id)) {
+    if (!user.categories?.includes(category._id)) {
       user.categories.push(category._id);
       await user.save();
     }
@@ -613,6 +615,12 @@ app.post('/submit_feedback', async (req, res) => {
     console.error('Error submitting feedback:', err);
     res.status(500).json({ error: 'Error submitting feedback', details: err.message });
   }
+});
+
+// Move error logging middleware here
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
 });
 
 // Start the server
