@@ -6,7 +6,12 @@ export default function Home() {
   const navigate = useNavigate();
 
   const handleBrowseList = () => {
-    navigate("/");
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user?.user_type === "City") {
+      navigate("/city/dashboard");
+    } else {
+      navigate("/");
+    }
   };
 
   return (

@@ -1,0 +1,58 @@
+.edit-component {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.edit-component h2 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.edit-component .form-group {
+  margin-bottom: 15px;
+}
+
+.edit-component label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.edit-component input,
+.edit-component select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.edit-component .form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.edit-component .save-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-component .cancel-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.edit-component .save-btn:hover {
+  background-color: #218838;
+}
+
+.edit-component .cancel-btn:hover {
+  background-color: #c82333;
+}

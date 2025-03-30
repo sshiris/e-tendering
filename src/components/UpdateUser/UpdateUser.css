@@ -1,0 +1,58 @@
+.update-user {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.update-user h3 {
+  font-size: 20px;
+  margin-bottom: 15px;
+}
+
+.update-user .form-group {
+  margin-bottom: 15px;
+}
+
+.update-user label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.update-user input,
+.update-user select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.update-user .form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.update-user .submit-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.update-user .cancel-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.update-user .submit-btn:hover {
+  background-color: #218838;
+}
+
+.update-user .cancel-btn:hover {
+  background-color: #c82333;
+}

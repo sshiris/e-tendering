@@ -24,13 +24,14 @@ import CitizenFeedback from "./components/citizenPage/CitizenFeedback";
 import ViewFeedback from "./components/citizenPage/ViewFeedback";
 import OpenTenders from "./components/citizenPage/OpenTenders";
 import ClosedTenders from "./components/citizenPage/ClosedTenders";
-import AllFeedbacks from "./components/citizenPage/AllFeedbacks";
 import TenderDetails from "./components/citizenPage/TenderDetails";
 import CityPage from "./components/cityPage/cityPage";
 import ManageCategories from "./components/cityPage/ManageCategories";
 import ManageUserCategories from "./components/cityPage/ManageUserCategories";
 import ManageUsers from "./components/cityPage/ManageUsers";
 import ViewAllTenders from "./components/cityPage/ViewAllTenders";
+import CreateAdmin from "./components/CreateAdmin/CreateAdmin";
+import CityDashboard from "./components/cityPage/CityDashboard";
 import ViewFeedbacks from "./components/cityPage/ViewFeedbacks";
 
 function App() {
@@ -39,7 +40,7 @@ function App() {
   const [isCitizen, setIsCitizen] = useState(false);
   const [user, setUser] = useState(null);
   const [tenders, setTenders] = useState([]);
-  const [bids, setBids] = useState([]);
+  const [users, setUsers] = useState([]);
   const API_URL = "http://localhost:5500";
 
   useEffect(() => {
@@ -53,7 +54,7 @@ function App() {
     }
 
     fetchTenders();
-    fetchBids();
+    fetchUsers();
 
     const interval = setInterval(() => {
       updateTenderStatus();
@@ -122,12 +123,16 @@ function App() {
     }
   };
 
-  const fetchBids = async () => {
+  const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API_URL}/bids`, { timeout: 5000 });
-      setBids(response.data);
+      const response = await axios.get(`${API_URL}/users`);
+      const users = response.data.map((user) => ({
+        ...user,
+        categories: user.categories.map((category) => category.category_id),
+      }));
+      setUsers(users);
     } catch (error) {
-      console.error("Error fetching bids:", error);
+      console.error("Error fetching users:", error);
     }
   };
 
@@ -136,15 +141,21 @@ function App() {
       const response = await axios.get(`${API_URL}/users`);
       const users = response.data;
 
+      if (!users || users.length === 0) {
+        console.error("No users found in the database.");
+        throw new Error("No users found. Please contact support.");
+      }
+
       let user = users.find(
         (u) =>
           (u.email === email || u.user_id === id) && u.password === password
       );
 
       if (!user) {
-        throw new Error(
-          "Invalid email, user ID, or password. Please try again."
+        console.error(
+          `Login failed for email: ${email}, user ID: ${id}. Invalid credentials.`
         );
+        throw new Error("Invalid email, user ID, or password. Please try again.");
       }
 
       if (user.user_type === "City") {
@@ -159,7 +170,8 @@ function App() {
         setIsCitizen(true);
         setIsCity(false);
         setIsCompany(false);
-      } else {
+      }
+     else {
         throw new Error("Invalid user type.");
       }
 
@@ -182,7 +194,7 @@ function App() {
 
       return true;
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Login failed:", error.response?.data || error.message);
       throw new Error(
         error.response?.data?.message ||
           error.message ||
@@ -224,6 +236,8 @@ function App() {
                 </>
               ) : isCity ? (
                 <CityPage user={user} />
+              ) : isCity ? (
+                <CityPage user={user} />
               ) : isCitizen ? (
                 <CitizenPage user={user} />
               ) : (
@@ -231,7 +245,6 @@ function App() {
               )
             }
           />
-
           <Route
             path="/company/bids"
             element={
@@ -394,6 +407,16 @@ function App() {
                   tenders={tenders}
                   updateTenderStatus={updateTenderStatus}
                 />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/create-admin"
+            element={
+              isCity ? (
+                <CreateAdmin />
               ) : (
                 <Navigate to="/login" />
               )
