@@ -26,8 +26,9 @@ import OpenTenders from "./components/citizenPage/OpenTenders";
 import ClosedTenders from "./components/citizenPage/ClosedTenders";
 import AllFeedbacks from "./components/citizenPage/AllFeedbacks";
 import TenderDetails from "./components/citizenPage/TenderDetails";
-import CityPage from "./components/cityPage/CityPage";
+import CityPage from "./components/cityPage/cityPage";
 import ManageCategories from "./components/cityPage/ManageCategories";
+import ManageUserCategories from "./components/cityPage/ManageUserCategories";
 import ManageUsers from "./components/cityPage/ManageUsers";
 import ViewAllTenders from "./components/cityPage/ViewAllTenders";
 import ViewFeedbacks from "./components/cityPage/ViewFeedbacks";
@@ -369,6 +370,12 @@ function App() {
             path="/city/dashboard"
             element={
               isCity ? <CityPage user={user} /> : <Navigate to="/login" />
+            }
+          />
+          <Route
+            path="/manage-user-categories"
+            element={
+              isCity ? <ManageUserCategories /> : <Navigate to="/login" />
             }
           />
           <Route
