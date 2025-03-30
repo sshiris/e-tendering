@@ -82,7 +82,6 @@ export default function CreateUser() {
     try {
       setError(null);
 
-      // Validate password
       const { isValid, errors } = validatePassword(newUser.password);
       if (!isValid) {
         setPasswordErrors(errors);
@@ -90,7 +89,6 @@ export default function CreateUser() {
         return;
       }
 
-      // Check if passwords match
       if (newUser.password !== newUser.confirmPassword) {
         setError("Passwords do not match");
         return;
@@ -103,7 +101,6 @@ export default function CreateUser() {
         return;
       }
 
-      // Check if email exists before creating the user
       console.log("Checking if email exists:", newUser.email);
       const emailCheckResponse = await axios.get(
         `${API_URL}/users?email=${newUser.email}`
@@ -115,7 +112,6 @@ export default function CreateUser() {
         return;
       }
 
-      // Create the user
       console.log("Creating user...");
       const userResponse = await axios.post(`${API_URL}/create_user`, {
         name: newUser.name,
@@ -132,7 +128,6 @@ export default function CreateUser() {
         throw new Error("Failed to retrieve user_id from server response.");
       }
 
-      // Add user to selected categories
       if (newUser.categories.length > 0) {
         console.log("Adding user to categories...");
         const categoryPromises = newUser.categories.map(async (category_id) => {
@@ -165,7 +160,6 @@ export default function CreateUser() {
         }
       }
 
-      // Fetch updated user data
       console.log("Fetching updated user data...");
       const updatedUserResponse = await axios.get(
         `${API_URL}/users/${createdUserId}`
@@ -178,7 +172,6 @@ export default function CreateUser() {
     } catch (error) {
       console.error("Error adding user or categories:", error);
 
-      // Enhanced error handling
       const errorMessage =
         error.response?.data?.error ||
         error.message ||

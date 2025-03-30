@@ -117,7 +117,7 @@ export default function DetailedTenderInfo({
               Delete
             </button>
           )}
-          <button onClick={() => navigate("/")}>Back</button>
+          <button onClick={() => navigate("/view-all-tenders")}>Back</button>
         </div>
       </div>
     </div>

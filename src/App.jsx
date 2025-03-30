@@ -27,10 +27,11 @@ import ClosedTenders from "./components/citizenPage/ClosedTenders";
 import AllFeedbacks from "./components/citizenPage/AllFeedbacks";
 import TenderDetails from "./components/citizenPage/TenderDetails";
 import CityPage from "./components/cityPage/CityPage";
-import ManageCategories from "./components/cityPage/ManageCategories"; // Import the new component
+import ManageCategories from "./components/cityPage/ManageCategories";
 import ManageUsers from "./components/cityPage/ManageUsers";
 import ViewAllTenders from "./components/cityPage/ViewAllTenders";
 import ViewFeedbacks from "./components/cityPage/ViewFeedbacks";
+
 function App() {
   const [isCompany, setIsCompany] = useState(false);
   const [isCity, setIsCity] = useState(false);
@@ -43,6 +44,15 @@ function App() {
   const API_URL = "http://localhost:5500";
 
   useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      const parsedUser = JSON.parse(storedUser);
+      setUser(parsedUser);
+      if (parsedUser.user_type === "City") setIsCity(true);
+      else if (parsedUser.user_type === "Company") setIsCompany(true);
+      else if (parsedUser.user_type === "Citizen") setIsCitizen(true);
+    }
+
     fetchTenders();
     fetchBids();
 
@@ -53,33 +63,50 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
-  const updateTenderStatus = (tendersToUpdate = tenders) => {
-    if (!tendersToUpdate || tendersToUpdate.length === 0)
+  const updateTenderStatus = async (tendersToUpdate = tenders) => {
+    if (!tendersToUpdate || tendersToUpdate.length === 0) {
       return tendersToUpdate;
+    }
 
     const currentDate = new Date();
-    const updatedTenders = tendersToUpdate.map((tender) => {
-      const noticeDate = new Date(tender.date_of_tender_notice);
-      const closeDate = new Date(tender.date_of_tender_close);
+    const updatedTenders = await Promise.all(
+      tendersToUpdate.map(async (tender) => {
+        const noticeDate = new Date(tender.date_of_tender_notice);
+        const closeDate = new Date(tender.date_of_tender_close);
 
-      if (closeDate <= noticeDate) {
-        console.error(
-          `Invalid dates for tender ${tender.tender_id}: date_of_tender_close (${closeDate}) must be greater than date_of_tender_notice (${noticeDate})`
-        );
-        return { ...tender, status: "Invalid" };
-      }
+        if (closeDate <= noticeDate) {
+          console.error(
+            `Invalid dates for tender ${tender.tender_id}: date_of_tender_close (${closeDate}) must be greater than date_of_tender_notice (${noticeDate})`
+          );
+          return { ...tender, tender_status: "Invalid" };
+        }
 
-      let newStatus;
-      if (currentDate < noticeDate) {
-        newStatus = "Pending";
-      } else if (currentDate >= noticeDate && currentDate <= closeDate) {
-        newStatus = "Open";
-      } else {
-        newStatus = "Closed";
-      }
+        let newStatus;
+        if (currentDate < noticeDate) {
+          newStatus = "Pending";
+        } else if (currentDate >= noticeDate && currentDate <= closeDate) {
+          newStatus = "Open";
+        } else {
+          newStatus = "Closed";
+        }
 
-      return { ...tender, tender_status: newStatus };
-    });
+        const updatedTender = { ...tender, tender_status: newStatus };
+
+        try {
+          await axios.put(
+            `${API_URL}/update_tender/${tender.tender_id}`,
+            updatedTender
+          );
+        } catch (updateErr) {
+          console.error(
+            `Failed to update tender ${tender.tender_id} on backend:`,
+            updateErr.message
+          );
+        }
+
+        return updatedTender;
+      })
+    );
 
     setTenders(updatedTenders);
     return updatedTenders;
@@ -87,9 +114,9 @@ function App() {
 
   const fetchTenders = async () => {
     try {
-      const response = await axios.get(`${API_URL}/find`);
+      const response = await axios.get(`${API_URL}/find`, { timeout: 5000 });
       const fetchedTenders = response.data;
-      const updatedTenders = updateTenderStatus(fetchedTenders);
+      const updatedTenders = await updateTenderStatus(fetchedTenders);
       setTenders(updatedTenders);
     } catch (error) {
       console.error("Error fetching tenders:", error);
@@ -98,7 +125,7 @@ function App() {
 
   const fetchBids = async () => {
     try {
-      const response = await axios.get(`${API_URL}/bids`);
+      const response = await axios.get(`${API_URL}/bids`, { timeout: 5000 });
       setBids(response.data);
     } catch (error) {
       console.error("Error fetching bids:", error);
@@ -115,11 +142,12 @@ function App() {
           (u.email === email || u.user_id === id) && u.password === password
       );
 
-      if (!user && !isAdminUser) {
+      if (!user) {
         throw new Error(
           "Invalid email, user ID, or password. Please try again."
         );
       }
+
       if (user.user_type === "City") {
         setIsCity(true);
         setIsCompany(false);
@@ -168,6 +196,7 @@ function App() {
     setIsCompany(false);
     setIsCity(false);
     setIsCitizen(false);
+    setIsAdmin(false);
     setUser(null);
     localStorage.removeItem("user");
   };
@@ -176,7 +205,7 @@ function App() {
     <Router>
       <div className="app">
         <Navbar
-          isAuthenticated={isCompany || isCity || isCitizen}
+          isAuthenticated={isCompany || isCity || isCitizen || isAdmin}
           handleLogout={handleLogout}
           userType={user?.user_type}
         />
@@ -196,15 +225,7 @@ function App() {
                   />
                 </>
               ) : isCity ? (
-                <>
-                  <CityPage user={user} />
-                  <TenderList
-                    tenders={tenders}
-                    isCompany={isCompany}
-                    isCity={isCity}
-                    isCitizen={isCitizen}
-                  />
-                </>
+                <CityPage user={user} />
               ) : isCitizen ? (
                 <CitizenPage user={user} />
               ) : (
@@ -219,7 +240,6 @@ function App() {
               isCompany ? <CompanyBids user={user} /> : <Navigate to="/login" />
             }
           />
-
           <Route
             path="/login"
             element={
@@ -227,6 +247,20 @@ function App() {
                 <Navigate to="/" />
               ) : (
                 <Login handleLogin={handleLogin} isAdmin={isAdmin} />
+              )
+            }
+          />
+          <Route
+            path="/list"
+            element={
+              isCompany || isCity || isCitizen ? (
+                <TenderList
+                  tenders={tenders}
+                  isCity={isCity}
+                  isCompany={isCompany}
+                />
+              ) : (
+                <Login handleLogin={handleLogin} />
               )
             }
           />
@@ -350,7 +384,16 @@ function App() {
           />
           <Route
             path="/view-all-tenders"
-            element={isCity ? <ViewAllTenders /> : <Navigate to="/login" />}
+            element={
+              isCity ? (
+                <ViewAllTenders
+                  tenders={tenders}
+                  updateTenderStatus={updateTenderStatus}
+                />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
           <Route
             path="/view-feedbacks"

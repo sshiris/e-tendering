@@ -22,10 +22,9 @@ function Navbar({ isAuthenticated, handleLogout }) {
             className="navbar-logo browse-list"
             onClick={() => navigate("/")}
           >
-            Browse List
+            Main
           </button>
         )}
-        <button className="navbar-logo">Work & Study</button>
         <button className="navbar-logo">Business</button>
         <button className="navbar-logo">About Us</button>
         <button className="navbar-logo">Events</button>
