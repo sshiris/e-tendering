@@ -6,6 +6,7 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
+import { validatePassword } from "../../utils/validation.js";
 import "./CreateUser.css";
 
 export default function CreateUser() {
@@ -17,11 +18,13 @@ export default function CreateUser() {
     address: "",
     user_type: "",
     password: "",
+    confirmPassword: "",
     email: "",
     categories: [],
   });
 
   const [error, setError] = useState(null);
+  const [passwordErrors, setPasswordErrors] = useState([]);
   const [availableCategories, setAvailableCategories] = useState([]);
   const [availableUserTypes, setAvailableUserTypes] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
@@ -34,17 +37,18 @@ export default function CreateUser() {
         const categoriesResponse = await axios.get(`${API_URL}/categories`);
         const categories = categoriesResponse.data;
 
-        // Проверяем, что категории содержат необходимые поля
         const validCategories = categories.map((category) => ({
           category_id: category.category_id,
           category_name: category.category_name,
-          user_type: category.user_type || "Company", // Устанавливаем значение по умолчанию, если user_type отсутствует
+          user_type: category.user_type || "Company",
         }));
 
         setAvailableCategories(validCategories);
 
         const userTypesResponse = await axios.get(`${API_URL}/user_types`);
-        setAvailableUserTypes(userTypesResponse.data.filter((type) => type.type_name !== "City"));
+        setAvailableUserTypes(
+          userTypesResponse.data.filter((type) => type.type_name !== "City")
+        );
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -64,10 +68,34 @@ export default function CreateUser() {
     }
   }, [newUser.user_type, availableCategories]);
 
+  useEffect(() => {
+    if (newUser.password) {
+      const { isValid, errors } = validatePassword(newUser.password);
+      setPasswordErrors(errors);
+    } else {
+      setPasswordErrors([]);
+    }
+  }, [newUser.password]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setError(null);
+
+      // Validate password
+      const { isValid, errors } = validatePassword(newUser.password);
+      if (!isValid) {
+        setPasswordErrors(errors);
+        setError("Please fix the password issues before submitting.");
+        return;
+      }
+
+      // Check if passwords match
+      if (newUser.password !== newUser.confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+
       console.log("Submitting form with data:", newUser);
 
       if (newUser.user_type === "City") {
@@ -77,9 +105,13 @@ export default function CreateUser() {
 
       // Check if email exists before creating the user
       console.log("Checking if email exists:", newUser.email);
-      const emailCheckResponse = await axios.get(`${API_URL}/users?email=${newUser.email}`);
+      const emailCheckResponse = await axios.get(
+        `${API_URL}/users?email=${newUser.email}`
+      );
       if (emailCheckResponse.data.exists) {
-        setError("This email is already registered. Please use a different email.");
+        setError(
+          "This email is already registered. Please use a different email."
+        );
         return;
       }
 
@@ -104,12 +136,20 @@ export default function CreateUser() {
       if (newUser.categories.length > 0) {
         console.log("Adding user to categories...");
         const categoryPromises = newUser.categories.map(async (category_id) => {
-          console.log(`Associating category_id: ${category_id} with user_id: ${createdUserId}`);
-          const response = await axios.post(`${API_URL}/add_user_to_specific_category`, {
-            user_id: createdUserId,
-            category_id,
-          });
-          console.log(`Category association response for category_id ${category_id}:`, response.data);
+          console.log(
+            `Associating category_id: ${category_id} with user_id: ${createdUserId}`
+          );
+          const response = await axios.post(
+            `${API_URL}/add_user_to_specific_category`,
+            {
+              user_id: createdUserId,
+              category_id,
+            }
+          );
+          console.log(
+            `Category association response for category_id ${category_id}:`,
+            response.data
+          );
           return response.data;
         });
 
@@ -118,14 +158,18 @@ export default function CreateUser() {
           console.log("User added to all selected categories successfully.");
         } catch (error) {
           console.error("Error adding user to categories:", error);
-          setError("Failed to add user to one or more categories. Please try again.");
+          setError(
+            "Failed to add user to one or more categories. Please try again."
+          );
           return;
         }
       }
 
       // Fetch updated user data
       console.log("Fetching updated user data...");
-      const updatedUserResponse = await axios.get(`${API_URL}/users/${createdUserId}`);
+      const updatedUserResponse = await axios.get(
+        `${API_URL}/users/${createdUserId}`
+      );
       console.log("Updated user data:", updatedUserResponse.data);
 
       setUserId(createdUserId);
@@ -152,7 +196,10 @@ export default function CreateUser() {
   };
 
   const handleCategoryChange = (e) => {
-    const selectedOptions = Array.from(e.target.selectedOptions, (option) => option.value);
+    const selectedOptions = Array.from(
+      e.target.selectedOptions,
+      (option) => option.value
+    );
     setNewUser((prev) => ({ ...prev, categories: selectedOptions }));
   };
 
@@ -204,6 +251,68 @@ export default function CreateUser() {
             required
             autoComplete="new-password"
           />
+          {passwordErrors.length > 0 && (
+            <ul className="password-error-list">
+              {passwordErrors.map((err, index) => (
+                <li key={index} className="password-error-item">
+                  {err}
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="password-requirements">
+            <p>Password must:</p>
+            <ul>
+              <li
+                className={
+                  newUser.password.length >= 8 && newUser.password.length <= 12
+                    ? "requirement-met"
+                    : ""
+                }
+              >
+                Be 8-12 characters long
+              </li>
+              <li
+                className={
+                  /[A-Z]/.test(newUser.password) ? "requirement-met" : ""
+                }
+              >
+                Contain at least one uppercase letter
+              </li>
+              <li
+                className={
+                  /[a-z]/.test(newUser.password) ? "requirement-met" : ""
+                }
+              >
+                Contain at least one lowercase letter
+              </li>
+              <li
+                className={
+                  /[0-9]/.test(newUser.password) ? "requirement-met" : ""
+                }
+              >
+                Contain at least one number
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div className="form-group">
+          <label htmlFor="confirmPassword">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            name="confirmPassword"
+            value={newUser.confirmPassword}
+            onChange={handleInputChange}
+            placeholder="Confirm password"
+            required
+            autoComplete="new-password"
+          />
+          {newUser.password &&
+            newUser.confirmPassword &&
+            newUser.password !== newUser.confirmPassword && (
+              <p className="password-error-item">Passwords do not match</p>
+            )}
         </div>
         <div className="form-group">
           <label htmlFor="address">Address</label>
@@ -227,7 +336,9 @@ export default function CreateUser() {
             onChange={handleInputChange}
             required
           >
-            <option value="" disabled>Select user type</option>
+            <option value="" disabled>
+              Select user type
+            </option>
             {availableUserTypes.map((type) => (
               <option key={type.type_id} value={type.type_name}>
                 {type.type_name}
@@ -253,11 +364,21 @@ export default function CreateUser() {
               ))}
             </select>
           ) : (
-            <p>Please select "Company" as the user type to choose categories.</p>
+            <p>
+              Please select "Company" as the user type to choose categories.
+            </p>
           )}
         </div>
         <div className="form-actions">
-          <button type="submit" className="submit-btn">
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={
+              passwordErrors.length > 0 ||
+              (newUser.password !== newUser.confirmPassword &&
+                newUser.confirmPassword)
+            }
+          >
             Create User
           </button>
           <button

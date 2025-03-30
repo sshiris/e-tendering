@@ -134,3 +134,58 @@ form {
 .form-actions .cancel-btn:hover {
   background-color: #d1d5db;
 }
+
+.password-requirements {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+  font-size: 0.9em;
+}
+
+.password-requirements p {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.password-requirements ul {
+  list-style-type: none;
+  padding-left: 10px;
+  margin: 0;
+}
+
+.password-requirements li {
+  margin-bottom: 3px;
+  padding-left: 20px;
+  position: relative;
+  color: #dc3545;
+}
+
+.password-requirements li::before {
+  content: "✕";
+  position: absolute;
+  left: 0;
+  color: #dc3545;
+}
+
+.password-requirements li.requirement-met {
+  color: #28a745;
+}
+
+.password-requirements li.requirement-met::before {
+  content: "✓";
+  color: #28a745;
+}
+
+.password-error-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin-top: 5px;
+  color: #dc3545;
+  font-size: 0.9em;
+}
+
+.password-error-item {
+  color: #dc3545;
+  margin-bottom: 3px;
+}

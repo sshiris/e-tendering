@@ -30,7 +30,7 @@ import CityPage from "./components/cityPage/CityPage";
 import ManageCategories from "./components/cityPage/ManageCategories"; // Import the new component
 import ManageUsers from "./components/cityPage/ManageUsers";
 import ViewAllTenders from "./components/cityPage/ViewAllTenders";
-
+import ViewFeedbacks from "./components/cityPage/ViewFeedbacks";
 function App() {
   const [isCompany, setIsCompany] = useState(false);
   const [isCity, setIsCity] = useState(false);
@@ -41,14 +41,6 @@ function App() {
   const [tenders, setTenders] = useState([]);
   const [bids, setBids] = useState([]);
   const API_URL = "http://localhost:5500";
-
-  const ADMIN_CREDENTIALS = [
-    {
-      email: "admin@admin.com",
-      password: "admin123",
-      canAccessAdminPage: true,
-    },
-  ];
 
   useEffect(() => {
     fetchTenders();
@@ -123,27 +115,12 @@ function App() {
           (u.email === email || u.user_id === id) && u.password === password
       );
 
-      const adminCred = ADMIN_CREDENTIALS.find(
-        (admin) => admin.email === email && admin.password === password
-      );
-      const isAdminUser = !!adminCred;
-      const adminPageAccess = adminCred?.canAccessAdminPage || false;
-
       if (!user && !isAdminUser) {
         throw new Error(
           "Invalid email, user ID, or password. Please try again."
         );
       }
-
-      if (isAdminUser && !user) {
-        user = adminCred;
-      }
-
-      setIsAdmin(isAdminUser);
-      setCanAccessAdminPage(adminPageAccess);
-
-      if (isAdminUser) {
-      } else if (user.user_type === "City") {
+      if (user.user_type === "City") {
         setIsCity(true);
         setIsCompany(false);
         setIsCitizen(false);
@@ -174,8 +151,6 @@ function App() {
         tenders: user.tenders || [],
         bids: user.bids || [],
         __v: user.__v || 0,
-        isAdmin: isAdminUser,
-        canAccessAdminPage: adminPageAccess,
       });
 
       return true;
@@ -193,8 +168,6 @@ function App() {
     setIsCompany(false);
     setIsCity(false);
     setIsCitizen(false);
-    setIsAdmin(false);
-    setCanAccessAdminPage(false);
     setUser(null);
     localStorage.removeItem("user");
   };
@@ -203,10 +176,9 @@ function App() {
     <Router>
       <div className="app">
         <Navbar
-          isAuthenticated={isCompany || isCity || isCitizen || isAdmin}
+          isAuthenticated={isCompany || isCity || isCitizen}
           handleLogout={handleLogout}
           userType={user?.user_type}
-          isAdmin={isAdmin}
         />
         <Routes>
           <Route path="/home" element={<Home />} />
@@ -235,17 +207,6 @@ function App() {
                 </>
               ) : isCitizen ? (
                 <CitizenPage user={user} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-
-          <Route
-            path="/admin"
-            element={
-              canAccessAdminPage ? (
-                <AdminPage user={user} />
               ) : (
                 <Navigate to="/login" />
               )
@@ -309,6 +270,7 @@ function App() {
                   tenders={tenders}
                   fetchTenders={fetchTenders}
                   user={user}
+                  isCity={isCity}
                 />
               </ConfirmProvider>
             }
@@ -366,63 +328,33 @@ function App() {
           />
           <Route
             path="/citizen/all-feedbacks"
-            element={
-              isCitizen ? (
-                <AllFeedbacks />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={isCitizen ? <AllFeedbacks /> : <Navigate to="/login" />}
           />
           <Route
             path="/citizen/tender-details/:id"
-            element={
-              isCitizen ? (
-                <TenderDetails />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={isCitizen ? <TenderDetails /> : <Navigate to="/login" />}
           />
           <Route
             path="/city/dashboard"
             element={
-              isCity ? (
-                <CityPage user={user} />
-              ) : (
-                <Navigate to="/login" />
-              )
+              isCity ? <CityPage user={user} /> : <Navigate to="/login" />
             }
           />
           <Route
             path="/manage-categories"
-            element={
-              isCity ? (
-                <ManageCategories />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={isCity ? <ManageCategories /> : <Navigate to="/login" />}
           />
           <Route
             path="/manage-users"
-            element={
-              isCity ? (
-                <ManageUsers />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={isCity ? <ManageUsers /> : <Navigate to="/login" />}
           />
           <Route
             path="/view-all-tenders"
-            element={
-              isCity ? (
-                <ViewAllTenders />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={isCity ? <ViewAllTenders /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/view-feedbacks"
+            element={isCity ? <ViewFeedbacks /> : <Navigate to="/login" />}
           />
           <Route path="*" element={<Navigate to="/home" />} />
         </Routes>

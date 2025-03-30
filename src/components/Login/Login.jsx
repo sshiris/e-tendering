@@ -38,7 +38,6 @@ function Login({ handleLogin, isAdmin, canAccessAdminPage }) {
       }
     }
 
-    // Redirect to /admin if already authenticated with admin page access
     if (canAccessAdminPage) {
       navigate("/admin");
     }
@@ -185,7 +184,7 @@ function Login({ handleLogin, isAdmin, canAccessAdminPage }) {
           <button
             type="button"
             className="cancel-btn"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/home")}
           >
             Cancel
           </button>
