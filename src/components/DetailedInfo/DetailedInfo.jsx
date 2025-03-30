@@ -57,7 +57,6 @@ export default function DetailedTenderInfo({
   }
 
   const isCompany = user && user.user_type == "Company";
-  console.log("isCompany:", isCompany);
   return (
     <div className="tender-detail">
       <h2>Tender Details</h2>
@@ -121,7 +120,7 @@ export default function DetailedTenderInfo({
               Delete
             </button>
           )}
-          <button onClick={() => navigate(-1)}>Back</button>
+          <button onClick={() => navigate("/")}>Back</button>
         </div>
       </div>
     </div>

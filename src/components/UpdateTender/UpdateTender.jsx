@@ -222,9 +222,6 @@ export default function UpdateTender({ tenders, fetchTenders, user_id }) {
             value={tender.tender_status}
             onChange={handleInputChange}
             required
-            style={{
-              color: tender.tender_status === "Open" ? "green" : "black",
-            }}
           >
             <option value="Open">Open</option>
             <option value="Closed">Closed</option>

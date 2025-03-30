@@ -7,6 +7,7 @@ const ViewAllTenders = memo(() => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState("All");
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const API_URL = "http://localhost:5500";
 
@@ -53,6 +54,10 @@ const ViewAllTenders = memo(() => {
       ? tenders
       : tenders.filter((tender) => tender.tender_status === filterStatus);
 
+  const searchFilteredTenders = filteredTenders.filter((tender) =>
+    tender.tender_name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   const statusOptions = ["All", "Open", "Pending", "Closed"];
 
   return (
@@ -81,6 +86,23 @@ const ViewAllTenders = memo(() => {
                 </option>
               ))}
             </select>
+
+            <div className="flex items-center space-x-4">
+              <label
+                htmlFor="search-input"
+                className="text-sm font-medium text-gray-700"
+              >
+                Search by Tender Name:
+              </label>
+              <input
+                id="search-input"
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-40 pl-3 pr-8 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md bg-white shadow-sm"
+                placeholder="Search"
+              />
+            </div>
           </div>
         </div>
 
@@ -113,9 +135,9 @@ const ViewAllTenders = memo(() => {
           </div>
         )}
 
-        {!loading && filteredTenders.length > 0 && (
+        {!loading && searchFilteredTenders.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredTenders.map((tender) => (
+            {searchFilteredTenders.map((tender) => (
               <div
                 key={tender.tender_id}
                 className="bg-white rounded-lg shadow-md overflow-hidden transform transition-all hover:scale-105 hover:shadow-xl"
@@ -178,7 +200,7 @@ const ViewAllTenders = memo(() => {
           </div>
         )}
 
-        {!loading && filteredTenders.length === 0 && (
+        {!loading && searchFilteredTenders.length === 0 && (
           <div className="text-center py-16 bg-white rounded-lg shadow-md">
             <svg
               className="mx-auto h-12 w-12 text-gray-400"

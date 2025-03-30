@@ -228,12 +228,6 @@ function App() {
               isCompany ? (
                 <>
                   <CompanyPage user={user} />
-                  <TenderList
-                    tenders={tenders}
-                    isCompany={isCompany}
-                    isCity={isCity}
-                    isCitizen={isCitizen}
-                  />
                 </>
               ) : isCity ? (
                 <CityPage user={user} />

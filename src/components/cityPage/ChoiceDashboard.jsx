@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router";
 import axios from "axios";
 import "./ChoiceDashboard.css";
 
@@ -7,7 +8,7 @@ export default function ChoiceDashboard() {
   const [users, setUsers] = useState([]);
   const [selectedWinners, setSelectedWinners] = useState({});
   const API_URL = "http://localhost:5500";
-
+  const navigate = useNavigate();
   useEffect(() => {
     fetchTenders();
     fetchUsers();
@@ -54,7 +55,10 @@ export default function ChoiceDashboard() {
 
       console.log("Finalizing decision with payload:", payload);
 
-      const response = await axios.put(`${API_URL}/update_tender/${tenderId}`, payload);
+      const response = await axios.put(
+        `${API_URL}/update_tender/${tenderId}`,
+        payload
+      );
 
       if (response.status === 200) {
         alert("Winner finalized successfully!");
@@ -63,7 +67,10 @@ export default function ChoiceDashboard() {
             tender.tender_id === tenderId
               ? {
                   ...tender,
-                  winner: { user_id: winnerId, name: users.find((user) => user.user_id === winnerId)?.name },
+                  winner: {
+                    user_id: winnerId,
+                    name: users.find((user) => user.user_id === winnerId)?.name,
+                  },
                   tender_status: "Awarded",
                 }
               : tender
@@ -73,10 +80,13 @@ export default function ChoiceDashboard() {
         throw new Error("Unexpected response from the server.");
       }
     } catch (error) {
-      console.error("Error finalizing winner:", error.response?.data || error.message);
+      console.error(
+        "Error finalizing winner:",
+        error.response?.data || error.message
+      );
       alert(
         error.response?.data?.message ||
-        "Failed to finalize winner. Please check the server logs for more details."
+          "Failed to finalize winner. Please check the server logs for more details."
       );
     }
   };
@@ -127,6 +137,7 @@ export default function ChoiceDashboard() {
           ))}
         </tbody>
       </table>
+      <button onClick={() => navigate(-1)}>Go back</button>
     </div>
   );
 }
