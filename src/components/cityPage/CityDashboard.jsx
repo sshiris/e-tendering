@@ -5,6 +5,8 @@ import CreateTender from "../CreateTender/CreateTender";
 import CreateUser from "../CreateUser/CreateUser";
 import UpdateUser from "../UpdateUser/UpdateUser"; // Import UpdateUser component
 import CategoryDashboard from "./CategoryDashboard"; // Import CategoryDashboard
+import CreateCityUser from "./CreateCityUser"; // Ensure CreateCityUser is imported
+import EditUser from "./EditUser"; // Import the new EditUser component
 import "./CityDashboard.css";
 
 export default function CityDashboard() {
@@ -112,6 +114,20 @@ export default function CityDashboard() {
     setEditingUserData(null); // Clear the editing user data
   };
 
+  const handleUpdateUser = async (updatedUser) => {
+    try {
+      const response = await axios.put(`${API_URL}/update_user/${updatedUser.user_id}`, updatedUser);
+      setUsers((prev) =>
+        prev.map((user) =>
+          user.user_id === updatedUser.user_id ? response.data.updatedUser : user
+        )
+      ); // Update the users list
+      setIsEditingUser(false); // Close the form
+    } catch (error) {
+      console.error("Error updating user:", error);
+    }
+  };
+
   const handleDeleteUser = async (userId) => {
     try {
       await axios.delete(`${API_URL}/delete_user/${userId}`);
@@ -207,8 +223,7 @@ export default function CityDashboard() {
         </table>
       </section>
       {isCreatingUser && (
-        <CreateUser
-          initialData={{ user_type: "City" }} // Predefine user_type as "City"
+        <CreateCityUser
           onCancel={handleCancelCreateUser}
           onSuccess={(newUser) => {
             setUsers((prev) => [...prev, { ...newUser, user_type: "City" }]); // Ensure user_type is "City"
@@ -217,18 +232,10 @@ export default function CityDashboard() {
         />
       )}
       {isEditingUser && (
-        <UpdateUser
+        <EditUser
           initialData={editingUserData} // Pass the user data to be edited
           onCancel={handleCancelEditUser} // Pass cancel handler
-          onSuccess={(updatedUser) => {
-            setUsers((prev) =>
-              prev.map((user) =>
-                user.user_id === updatedUser.user_id ? updatedUser : user
-              )
-            ); // Update users list
-            setIsEditingUser(false); // Close the form
-          }}
-          isCityUser={editingUserData?.user_type === "City"} // Pass isCityUser prop based on user type
+          onSuccess={handleUpdateUser} // Pass success handler
         />
       )}
 

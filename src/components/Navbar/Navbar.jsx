@@ -25,10 +25,6 @@ function Navbar({ isAuthenticated, handleLogout }) {
             Browse List
           </button>
         )}
-        <button className="navbar-logo">Work & Study</button>
-        <button className="navbar-logo">Business</button>
-        <button className="navbar-logo">About Us</button>
-        <button className="navbar-logo">Events</button>
 
         {isAuthenticated ? (
           <button className="navbar-btn log-out" onClick={handleLogout}>

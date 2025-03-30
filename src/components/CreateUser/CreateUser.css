@@ -72,6 +72,11 @@ form {
   margin-top: 4px;
 }
 
+.form-group#user_type,
+.form-group#categories {
+  display: none;
+}
+
 .category-checkboxes {
   display: flex;
   flex-wrap: wrap;

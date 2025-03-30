@@ -82,7 +82,7 @@ export default function UpdateUser({ initialData, onCancel, onSuccess, isCityUse
       const response = await axios.put(`${API_URL}/update_user/${updatedUser.user_id}`, payload);
       console.log("User updated successfully:", response.data);
 
-      onSuccess(response.data.updatedUser);
+      onSuccess(response.data.updatedUser); // Call onSuccess with updated user data
     } catch (error) {
       console.error("Error updating user:", error);
       setError(error.response?.data?.message || "Failed to update user");
