@@ -31,6 +31,8 @@ import CityPage from "./components/cityPage/CityPage";
 import ManageCategories from "./components/cityPage/ManageCategories"; // Import the new component
 import ManageUsers from "./components/cityPage/ManageUsers";
 import ViewAllTenders from "./components/cityPage/ViewAllTenders";
+import CreateAdmin from "./components/CreateAdmin/CreateAdmin";
+import CityDashboard from "./components/cityPage/CityDashboard";
 
 function App() {
   const [isCompany, setIsCompany] = useState(false);
@@ -39,11 +41,13 @@ function App() {
   const [user, setUser] = useState(null);
   const [tenders, setTenders] = useState([]);
   const [bids, setBids] = useState([]);
+  const [users, setUsers] = useState([]);
   const API_URL = "http://localhost:5500";
 
   useEffect(() => {
     fetchTenders();
     fetchBids();
+    fetchUsers();
 
     const interval = setInterval(() => {
       updateTenderStatus();
@@ -53,8 +57,7 @@ function App() {
   }, []);
 
   const updateTenderStatus = (tendersToUpdate = tenders) => {
-    if (!tendersToUpdate || tendersToUpdate.length === 0)
-      return tendersToUpdate;
+    if (!tendersToUpdate || tendersToUpdate.length === 0) return tendersToUpdate;
 
     const currentDate = new Date();
     const updatedTenders = tendersToUpdate.map((tender) => {
@@ -62,10 +65,10 @@ function App() {
       const closeDate = new Date(tender.date_of_tender_close);
 
       if (closeDate <= noticeDate) {
-        console.error(
-          `Invalid dates for tender ${tender.tender_id}: date_of_tender_close (${closeDate}) must be greater than date_of_tender_notice (${noticeDate})`
+        console.warn(
+          `Skipping tender ${tender.tender_id}: date_of_tender_close (${closeDate}) must be greater than date_of_tender_notice (${noticeDate})`
         );
-        return { ...tender, status: "Invalid" };
+        return tender; // Skip updating this tender
       }
 
       let newStatus;
@@ -104,10 +107,28 @@ function App() {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/users`);
+      const users = response.data.map((user) => ({
+        ...user,
+        categories: user.categories.map((category) => category.category_id),
+      }));
+      setUsers(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  };
+
   const handleLogin = async (email, password, id) => {
     try {
       const response = await axios.get(`${API_URL}/users`);
       const users = response.data;
+
+      if (!users || users.length === 0) {
+        console.error("No users found in the database.");
+        throw new Error("No users found. Please contact support.");
+      }
 
       const user = users.find(
         (u) =>
@@ -115,9 +136,10 @@ function App() {
       );
 
       if (!user) {
-        throw new Error(
-          "Invalid email, user ID, or password. Please try again."
+        console.error(
+          `Login failed for email: ${email}, user ID: ${id}. Invalid credentials.`
         );
+        throw new Error("Invalid email, user ID, or password. Please try again.");
       }
 
       if (user.user_type === "City") {
@@ -133,9 +155,6 @@ function App() {
         setIsCity(false);
         setIsCompany(false);
       }
-      if (!user) {
-        throw new Error("Invalid user. Try again");
-      }
 
       localStorage.setItem("user", JSON.stringify(user));
 
@@ -149,7 +168,7 @@ function App() {
 
       return true;
     } catch (error) {
-      console.error("Login failed:", error);
+      console.error("Login failed:", error.response?.data || error.message);
       throw new Error(
         error.response?.data?.message ||
           error.message ||
@@ -209,6 +228,8 @@ function App() {
                     isCitizen={isCitizen}
                   />
                 </>
+              ) : isCity ? (
+                <CityPage user={user} />
               ) : isCitizen ? (
                 <CitizenPage user={user} />
               ) : (
@@ -216,14 +237,12 @@ function App() {
               )
             }
           />
-
           <Route
             path="/company/bids"
             element={
               isCompany ? <CompanyBids user={user} /> : <Navigate to="/login" />
             }
           />
-
           <Route
             path="/login"
             element={
@@ -349,7 +368,7 @@ function App() {
             path="/city/dashboard"
             element={
               isCity ? (
-                <CityPage user={user} />
+                <CityDashboard />
               ) : (
                 <Navigate to="/login" />
               )
@@ -380,6 +399,16 @@ function App() {
             element={
               isCity ? (
                 <ViewAllTenders />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/create-admin"
+            element={
+              isCity ? (
+                <CreateAdmin />
               ) : (
                 <Navigate to="/login" />
               )

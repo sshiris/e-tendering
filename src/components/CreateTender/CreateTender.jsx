@@ -3,8 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./CreateTender.css";
 
-export default function CreateTender({ setTenders, fetchTenders, user_id }) {
+export default function CreateTender({ setTenders, fetchTenders }) {
   const API_URL = "http://localhost:5500";
+  const user = JSON.parse(localStorage.getItem("user")); // Retrieve logged-in user details
   const today = new Date().toISOString().slice(0, 16).replace("T", " ");
   const todayDate = new Date().toISOString().split("T")[0];
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ export default function CreateTender({ setTenders, fetchTenders, user_id }) {
     date_of_tender_winner: today,
     bidding_price: 0,
     tender_status: "Open",
-    staff_id: user_id || "",
+    staff_id: user?.user_id || "", // Use logged-in user's ID
   });
   const [error, setError] = useState(null);
 
@@ -45,16 +46,10 @@ export default function CreateTender({ setTenders, fetchTenders, user_id }) {
     e.preventDefault();
     addTender(newTender);
     setNewTender({
+      ...newTender,
       tender_name: "",
       description: "",
-      construction_from: todayDate,
-      construction_to: todayDate,
-      date_of_tender_notice: today,
-      date_of_tender_close: today,
-      date_of_tender_winner: today,
       bidding_price: 0,
-      tender_status: "Open",
-      staff_id: user_id || "",
     });
   };
 
