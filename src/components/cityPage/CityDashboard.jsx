@@ -7,6 +7,7 @@ import UpdateUser from "../UpdateUser/UpdateUser"; // Import UpdateUser componen
 import CategoryDashboard from "./CategoryDashboard"; // Import CategoryDashboard
 import CreateCityUser from "./CreateCityUser"; // Ensure CreateCityUser is imported
 import EditUser from "./EditUser"; // Import the new EditUser component
+import ChoiceDashboard from "./ChoiceDashboard"; // Import ChoiceDashboard
 import "./CityDashboard.css";
 
 export default function CityDashboard() {
@@ -241,8 +242,12 @@ export default function CityDashboard() {
 
       {/* Categories Section */}
       <section>
-        
         <CategoryDashboard />
+      </section>
+
+      {/* Choice Dashboard Section */}
+      <section>
+        <ChoiceDashboard />
       </section>
 
       {/* Edit Form */}

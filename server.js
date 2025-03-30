@@ -517,13 +517,31 @@ app.post('/remove_user_from_category', async (req, res) => {
 app.put('/update_tender/:tender_id', async (req, res) => {
   try {
     const { tender_id } = req.params;
-    const updatedTender = await Tender.findOneAndUpdate({ tender_id }, req.body, { new: true });
+    const { winner, tender_status } = req.body;
+
+    // Validate input
+    if (!winner || !tender_status) {
+      console.error("Invalid input:", { winner, tender_status });
+      return res.status(400).json({ error: 'Winner and tender status are required.' });
+    }
+
+    console.log("Updating tender:", { tender_id, winner, tender_status });
+
+    const updatedTender = await Tender.findOneAndUpdate(
+      { tender_id },
+      { $set: { winner, tender_status } },
+      { new: true }
+    ).populate('winner', 'user_id name'); // Populate winner's user_id and name
+
     if (!updatedTender) {
+      console.error("Tender not found:", tender_id);
       return res.status(404).json({ error: 'Tender not found' });
     }
+
+    console.log("Tender updated successfully:", updatedTender);
     res.json({ message: 'Tender updated successfully', updatedTender });
   } catch (err) {
-    console.error('Error updating tender:', err);
+    console.error('Error updating tender:', err.message, err.stack);
     res.status(500).json({ error: 'Error updating tender', details: err.message });
   }
 });
