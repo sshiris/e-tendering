@@ -23,7 +23,12 @@ const ManageCategories = memo(() => {
       const response = await axios.get(`${API_URL}/categories`, {
         timeout: 5000,
       });
-      setCategories(response.data);
+      setCategories(
+        response.data.map((cat) => ({
+          ...cat,
+          category_name: cat.category_name || "",
+        }))
+      );
       setError(null);
     } catch (err) {
       setError(getErrorMessage(err));
@@ -40,56 +45,118 @@ const ManageCategories = memo(() => {
 
   const handleAddCategory = async (e) => {
     e.preventDefault();
-    if (!newCategory.trim()) {
+    const trimmedCategory = newCategory.trim();
+
+    if (!trimmedCategory) {
       setError("Category name cannot be empty");
+      return;
+    }
+    if (
+      categories.some(
+        (cat) =>
+          cat.category_name?.toLowerCase() === trimmedCategory.toLowerCase()
+      )
+    ) {
+      setError("Category name already exists");
       return;
     }
 
     const tempId = "TEMP-" + Date.now();
+    const tempCategory = {
+      category_id: tempId,
+      category_name: trimmedCategory,
+    };
+
+    setCategories((prev) => [...prev, tempCategory]);
     setOperationLoading((prev) => ({ ...prev, [tempId]: true }));
+    setNewCategory("");
 
     try {
       const response = await axios.post(`${API_URL}/create_category`, {
         category_id: "CAT-" + Date.now(),
-        category_name: newCategory.trim(),
+        category_name: trimmedCategory,
       });
-      setCategories([...categories, response.data]);
-      setNewCategory("");
+      fetchCategories();
+      setCategories((prev) =>
+        prev.map((cat) => (cat.category_id === tempId ? response.data : cat))
+      );
       setError(null);
     } catch (err) {
+      setCategories((prev) => prev.filter((cat) => cat.category_id !== tempId));
+      setNewCategory(trimmedCategory);
       setError(getErrorMessage(err));
     } finally {
       setOperationLoading((prev) => ({ ...prev, [tempId]: false }));
     }
   };
 
-  const handleEditCategory = async (categoryId, newName) => {
-    if (!newName.trim()) {
+  const handleEditCategory = async (categoryId) => {
+    const trimmedName = editingCategory?.newName?.trim();
+
+    if (!trimmedName) {
       setError("Category name cannot be empty");
       return;
     }
+    if (trimmedName.length < 2) {
+      setError("Category name must be at least 2 characters long");
+      return;
+    }
+    if (
+      categories.some(
+        (cat) =>
+          cat.category_id !== categoryId &&
+          cat.category_name?.toLowerCase() === trimmedName.toLowerCase()
+      )
+    ) {
+      setError("Category name already exists");
+      return;
+    }
 
+    const originalCategory = categories.find(
+      (cat) => cat.category_id === categoryId
+    );
+
+    setCategories((prev) =>
+      prev.map((cat) =>
+        cat.category_id === categoryId
+          ? { ...cat, category_name: trimmedName }
+          : cat
+      )
+    );
     setOperationLoading((prev) => ({ ...prev, [categoryId]: true }));
+
     try {
       const response = await axios.put(
         `${API_URL}/update_category/${categoryId}`,
         {
-          category_name: newName.trim(),
+          category_name: trimmedName,
         }
       );
-      setCategories(
-        categories.map((cat) =>
-          cat.category_id === categoryId ? response.data.updatedCategory : cat
-        )
-      );
+
+      if (response.data.updatedCategory) {
+        setCategories((prev) =>
+          prev.map((cat) =>
+            cat.category_id === categoryId ? response.data.updatedCategory : cat
+          )
+        );
+      } else {
+        fetchCategories();
+      }
+
       setEditingCategory(null);
       setError(null);
     } catch (err) {
+      setCategories((prev) =>
+        prev.map((cat) =>
+          cat.category_id === categoryId ? originalCategory : cat
+        )
+      );
       setError(getErrorMessage(err));
     } finally {
       setOperationLoading((prev) => ({ ...prev, [categoryId]: false }));
     }
   };
+
   const filteredCategories = categories.filter((category) =>
     category.category_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -97,40 +164,16 @@ const ManageCategories = memo(() => {
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
+        <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-extrabold text-gray-900">
             Manage Categories
           </h1>
-          <div className="flex items-center gap-4">
-            <div className="relative w-full sm:w-64">
-              <input
-                type="text"
-                placeholder="Search categories..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white shadow-sm"
-              />
-              <svg
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </div>
-            <button
-              onClick={() => navigate("/city/dashboard")}
-              className="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition duration-200"
-            >
-              Go Back
-            </button>
-          </div>
+          <button
+            onClick={() => navigate("/city/dashboard")}
+            className="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700"
+          >
+            Go Back
+          </button>
         </div>
 
         <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
@@ -143,53 +186,28 @@ const ManageCategories = memo(() => {
               value={newCategory}
               onChange={(e) => setNewCategory(e.target.value)}
               placeholder="Enter category name"
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={Object.values(operationLoading).some(Boolean)}
+              className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition duration-200 disabled:opacity-50"
-              disabled={Object.values(operationLoading).some(Boolean)}
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              {Object.values(operationLoading).some(Boolean)
-                ? "Processing..."
-                : "Add Category"}
+              Add Category
             </button>
           </form>
         </div>
 
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
-            <svg
-              className="h-5 w-5 text-red-500"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clipRule="evenodd"
-              />
-            </svg>
-            <p className="text-sm text-red-600">{error}</p>
-          </div>
-        )}
-
-        {loading && (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full"></div>
-          </div>
-        )}
-
-        {!loading && filteredCategories.length > 0 && (
+        {loading ? (
+          <div className="text-center py-12">Loading...</div>
+        ) : (
           <div className="bg-white shadow-lg rounded-lg overflow-hidden">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                     Category Name
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                     Actions
                   </th>
                 </tr>
@@ -197,92 +215,60 @@ const ManageCategories = memo(() => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {filteredCategories.map((category) => (
                   <tr key={category.category_id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {editingCategory === category.category_id ? (
-                        <div className="flex items-center w-full">
-                          <input
-                            type="text"
-                            defaultValue={category.category_name}
-                            id={`edit-input-${category.category_id}`}
-                            className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-                            autoFocus
-                          />
-                        </div>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {editingCategory?.id === category.category_id ? (
+                        <input
+                          type="text"
+                          value={editingCategory.newName}
+                          onChange={(e) =>
+                            setEditingCategory({
+                              id: category.category_id,
+                              newName: e.target.value,
+                            })
+                          }
+                          className="w-full px-2 py-1 border rounded"
+                          autoFocus
+                        />
                       ) : (
                         category.category_name
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm space-x-2">
-                      {editingCategory !== category.category_id ? (
+                    <td className="px-6 py-4 text-right text-sm space-x-2">
+                      {editingCategory?.id === category.category_id ? (
                         <>
                           <button
                             onClick={() =>
-                              setEditingCategory(category.category_id)
+                              handleEditCategory(category.category_id)
                             }
-                            className="text-blue-600 hover:text-blue-800 disabled:opacity-50"
-                            disabled={operationLoading[category.category_id]}
+                            className="text-green-600"
                           >
-                            Edit
-                          </button>
-                        </>
-                      ) : (
-                        <div className="flex justify-end space-x-2">
-                          <button
-                            onClick={() => {
-                              const newValue = document.getElementById(
-                                `edit-input-${category.category_id}`
-                              ).value;
-                              handleEditCategory(
-                                category.category_id,
-                                newValue
-                              );
-                            }}
-                            className="text-green-600 hover:text-green-800 disabled:opacity-50"
-                            disabled={operationLoading[category.category_id]}
-                          >
-                            {operationLoading[category.category_id]
-                              ? "Saving..."
-                              : "Save"}
+                            Save
                           </button>
                           <button
                             onClick={() => setEditingCategory(null)}
-                            className="text-gray-600 hover:text-gray-800"
+                            className="text-gray-600"
                           >
                             Cancel
                           </button>
-                        </div>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            setEditingCategory({
+                              id: category.category_id,
+                              newName: category.category_name,
+                            })
+                          }
+                          className="text-blue-600"
+                        >
+                          Edit
+                        </button>
                       )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
-        )}
-
-        {!loading && filteredCategories.length === 0 && (
-          <div className="text-center py-12 bg-white rounded-lg shadow-md">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
-              />
-            </svg>
-            <h3 className="mt-2 text-sm font-medium text-gray-900">
-              No Categories Found
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              {searchTerm
-                ? "No categories match your search."
-                : "Add a category above to get started!"}
-            </p>
           </div>
         )}
       </div>
