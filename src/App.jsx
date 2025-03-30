@@ -26,8 +26,10 @@ import OpenTenders from "./components/citizenPage/OpenTenders";
 import ClosedTenders from "./components/citizenPage/ClosedTenders";
 import AllFeedbacks from "./components/citizenPage/AllFeedbacks";
 import TenderDetails from "./components/citizenPage/TenderDetails";
-import CityPage from "./components/cityPage/cityPage";
-import AdminPage from "./components/adminPage/AdminPage";
+import CityPage from "./components/cityPage/CityPage";
+import ManageCategories from "./components/cityPage/ManageCategories"; // Import the new component
+import ManageUsers from "./components/cityPage/ManageUsers";
+import ViewAllTenders from "./components/cityPage/ViewAllTenders";
 
 function App() {
   const [isCompany, setIsCompany] = useState(false);
@@ -364,13 +366,64 @@ function App() {
           />
           <Route
             path="/citizen/all-feedbacks"
-            element={isCitizen ? <AllFeedbacks /> : <Navigate to="/login" />}
+            element={
+              isCitizen ? (
+                <AllFeedbacks />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
           <Route
             path="/citizen/tender-details/:id"
-            element={isCitizen ? <TenderDetails /> : <Navigate to="/login" />}
+            element={
+              isCitizen ? (
+                <TenderDetails />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
           />
-
+          <Route
+            path="/city/dashboard"
+            element={
+              isCity ? (
+                <CityPage user={user} />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/manage-categories"
+            element={
+              isCity ? (
+                <ManageCategories />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/manage-users"
+            element={
+              isCity ? (
+                <ManageUsers />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
+          <Route
+            path="/view-all-tenders"
+            element={
+              isCity ? (
+                <ViewAllTenders />
+              ) : (
+                <Navigate to="/login" />
+              )
+            }
+          />
           <Route path="*" element={<Navigate to="/home" />} />
         </Routes>
       </div>
