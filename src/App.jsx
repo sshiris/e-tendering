@@ -36,8 +36,6 @@ function App() {
   const [isCompany, setIsCompany] = useState(false);
   const [isCity, setIsCity] = useState(false);
   const [isCitizen, setIsCitizen] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [canAccessAdminPage, setCanAccessAdminPage] = useState(false);
   const [user, setUser] = useState(null);
   const [tenders, setTenders] = useState([]);
   const [bids, setBids] = useState([]);
@@ -196,7 +194,6 @@ function App() {
     setIsCompany(false);
     setIsCity(false);
     setIsCitizen(false);
-    setIsAdmin(false);
     setUser(null);
     localStorage.removeItem("user");
   };
@@ -205,7 +202,7 @@ function App() {
     <Router>
       <div className="app">
         <Navbar
-          isAuthenticated={isCompany || isCity || isCitizen || isAdmin}
+          isAuthenticated={isCompany || isCity || isCitizen}
           handleLogout={handleLogout}
           userType={user?.user_type}
         />
@@ -243,10 +240,10 @@ function App() {
           <Route
             path="/login"
             element={
-              isCompany || isCity || isCitizen || isAdmin ? (
+              isCompany || isCity || isCitizen ? (
                 <Navigate to="/" />
               ) : (
-                <Login handleLogin={handleLogin} isAdmin={isAdmin} />
+                <Login handleLogin={handleLogin} />
               )
             }
           />

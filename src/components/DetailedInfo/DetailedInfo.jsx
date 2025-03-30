@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./DetailedInfo.css";
 import { useConfirm } from "material-ui-confirm";
-
+import DetailedBids from "./DetailedBids";
 export default function DetailedTenderInfo({
   tenders,
   fetchTenders,
@@ -62,7 +62,7 @@ export default function DetailedTenderInfo({
     <div className="tender-detail">
       <h2>Tender Details</h2>
       <div className="tender-card">
-        <h3>{tender.tender_name}</h3>
+        <h2>{tender.tender_name}</h2>
         <div className="detail-row">
           <p>
             <strong>ID:</strong> {tender.tender_id}
@@ -98,11 +98,15 @@ export default function DetailedTenderInfo({
             <strong>Status:</strong> {tender.tender_status}
           </p>
         </div>
-        <div className="detail-row">
-          <p>
-            <strong>Staff ID:</strong> {tender.staff_id}
-          </p>
-        </div>
+        {(isCity || isCompany) && (
+          <div className="detail-row">
+            <p>
+              <strong>Staff ID:</strong> {tender.staff_id}
+            </p>
+          </div>
+        )}
+
+        <DetailedBids tender={tender} />
         <div className="actions">
           {isCity && (
             <button
@@ -117,7 +121,7 @@ export default function DetailedTenderInfo({
               Delete
             </button>
           )}
-          <button onClick={() => navigate("/view-all-tenders")}>Back</button>
+          <button onClick={() => navigate(-1)}>Back</button>
         </div>
       </div>
     </div>

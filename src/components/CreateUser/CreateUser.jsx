@@ -377,7 +377,7 @@ export default function CreateUser() {
           <button
             type="button"
             className="cancel-btn"
-            onClick={() => navigate("/login")}
+            onClick={() => navigate(-1)}
           >
             Cancel
           </button>

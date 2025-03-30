@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
-function Login({ handleLogin, isAdmin, canAccessAdminPage }) {
+function Login({ handleLogin }) {
   const navigate = useNavigate();
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
@@ -37,11 +37,7 @@ function Login({ handleLogin, isAdmin, canAccessAdminPage }) {
         setLoginAttempts(0);
       }
     }
-
-    if (canAccessAdminPage) {
-      navigate("/admin");
-    }
-  }, [canAccessAdminPage, navigate]);
+  }, [navigate]);
 
   useEffect(() => {
     if (isLocked && lockoutTime) {
@@ -99,8 +95,6 @@ function Login({ handleLogin, isAdmin, canAccessAdminPage }) {
         setLoginAttempts(0);
 
         const user = JSON.parse(localStorage.getItem("user") || "{}");
-        const hasAdminPageAccess = user.canAccessAdminPage || false;
-        navigate(hasAdminPageAccess ? "/admin" : "/");
       }
     } catch (err) {
       const newAttempts = loginAttempts + 1;
