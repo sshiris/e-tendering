@@ -4,6 +4,7 @@ import EditComponent from "./EditComponent";
 import CreateTender from "../CreateTender/CreateTender";
 import CreateUser from "../CreateUser/CreateUser";
 import UpdateUser from "../UpdateUser/UpdateUser"; // Import UpdateUser component
+import CategoryDashboard from "./CategoryDashboard"; // Import CategoryDashboard
 import "./CityDashboard.css";
 
 export default function CityDashboard() {
@@ -121,7 +122,6 @@ export default function CityDashboard() {
   };
 
   const handleCreateCityUser = () => {
-    setEditingUserData({ user_type: "City" }); // Predefine user_type as "City"
     setIsCreatingUser(true); // Open the CreateUser form
   };
 
@@ -208,11 +208,11 @@ export default function CityDashboard() {
       </section>
       {isCreatingUser && (
         <CreateUser
-          initialData={editingUserData} // Pass predefined user_type as "City"
-          onCancel={handleCancelCreateUser} // Pass cancel handler
+          initialData={{ user_type: "City" }} // Predefine user_type as "City"
+          onCancel={handleCancelCreateUser}
           onSuccess={(newUser) => {
-            setUsers((prev) => [...prev, newUser]); // Update users list
-            setIsCreatingUser(false); // Close the form
+            setUsers((prev) => [...prev, { ...newUser, user_type: "City" }]); // Ensure user_type is "City"
+            setIsCreatingUser(false);
           }}
         />
       )}
@@ -231,6 +231,12 @@ export default function CityDashboard() {
           isCityUser={editingUserData?.user_type === "City"} // Pass isCityUser prop based on user type
         />
       )}
+
+      {/* Categories Section */}
+      <section>
+        
+        <CategoryDashboard />
+      </section>
 
       {/* Edit Form */}
       {isEditing && (

@@ -39,22 +39,12 @@ function App() {
   const [isCitizen, setIsCitizen] = useState(false);
   const [user, setUser] = useState(null);
   const [tenders, setTenders] = useState([]);
-<<<<<<< HEAD
-  const [bids, setBids] = useState([]);
   const [users, setUsers] = useState([]);
-=======
-  // Removed unused 'bids' state variable
->>>>>>> 3b78a0e851ee63a9430819d92db3a81b3f68d9bc
   const API_URL = "http://localhost:5500";
 
   useEffect(() => {
     fetchTenders();
-<<<<<<< HEAD
-    fetchBids();
     fetchUsers();
-=======
-    // Removed fetchBids call as 'bids' state is no longer used
->>>>>>> 3b78a0e851ee63a9430819d92db3a81b3f68d9bc
 
     const interval = setInterval(() => {
       updateTenderStatus();
@@ -104,8 +94,6 @@ function App() {
       console.error("Error fetching tenders:", error);
     }
   };
-
-  // Removed fetchBids function as 'bids' state is no longer used
 
   const fetchUsers = async () => {
     try {
