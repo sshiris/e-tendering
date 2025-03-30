@@ -31,7 +31,7 @@ import ManageUserCategories from "./components/cityPage/ManageUserCategories";
 import ManageUsers from "./components/cityPage/ManageUsers";
 import ViewAllTenders from "./components/cityPage/ViewAllTenders";
 import CreateAdmin from "./components/CreateAdmin/CreateAdmin";
-import CityDashboard from "./components/cityPage/CityDashboard";
+import ChoiceDashboard from "./components/cityPage/ChoiceDashboard";
 import ViewFeedbacks from "./components/cityPage/ViewFeedbacks";
 
 function App() {
@@ -155,7 +155,9 @@ function App() {
         console.error(
           `Login failed for email: ${email}, user ID: ${id}. Invalid credentials.`
         );
-        throw new Error("Invalid email, user ID, or password. Please try again.");
+        throw new Error(
+          "Invalid email, user ID, or password. Please try again."
+        );
       }
 
       if (user.user_type === "City") {
@@ -170,8 +172,7 @@ function App() {
         setIsCitizen(true);
         setIsCity(false);
         setIsCompany(false);
-      }
-     else {
+      } else {
         throw new Error("Invalid user type.");
       }
 
@@ -234,8 +235,6 @@ function App() {
                     isCitizen={isCitizen}
                   />
                 </>
-              ) : isCity ? (
-                <CityPage user={user} />
               ) : isCity ? (
                 <CityPage user={user} />
               ) : isCitizen ? (
@@ -372,10 +371,6 @@ function App() {
             }
           />
           <Route
-            path="/citizen/all-feedbacks"
-            element={isCitizen ? <AllFeedbacks /> : <Navigate to="/login" />}
-          />
-          <Route
             path="/citizen/tender-details/:id"
             element={isCitizen ? <TenderDetails /> : <Navigate to="/login" />}
           />
@@ -385,6 +380,7 @@ function App() {
               isCity ? <CityPage user={user} /> : <Navigate to="/login" />
             }
           />
+          <Route path="/choice-dashboard" element={<ChoiceDashboard />} />
           <Route
             path="/manage-user-categories"
             element={
@@ -414,13 +410,7 @@ function App() {
           />
           <Route
             path="/create-admin"
-            element={
-              isCity ? (
-                <CreateAdmin />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
+            element={isCity ? <CreateAdmin /> : <Navigate to="/login" />}
           />
           <Route
             path="/view-feedbacks"

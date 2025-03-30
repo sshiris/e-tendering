@@ -6,50 +6,59 @@ const BUTTON_CONFIG = [
   {
     label: "Create New Tender",
     path: "/create-tender",
-    color: "blue",
+    color: "from-blue-500 to-blue-700",
+    hover: "hover:from-blue-600 hover:to-blue-800",
     icon: "M12 4v16m8-8H4",
   },
   {
     label: "Manage Categories",
     path: "/manage-categories",
-    color: "green",
-    icon: "M3 7h18M3 12h18M3 17h18",
+    color: "from-green-500 to-green-700", 
+    hover: "hover:from-green-600 hover:to-green-800",
+    icon: "M20 13V7a2 2 0 00-2-2H6a2 2 0 00-2 2v6M4 13l8 8m0 0l8-8m-8 8V4",
   },
   {
     label: "Manage User-Category Relationships",
     path: "/manage-user-categories",
-    color: "gray",
-    icon: "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 1.857h5M3 12h18",
+    color: "from-gray-500 to-gray-700",
+    hover: "hover:from-gray-600 hover:to-gray-800",
+    icon: "M5 13l4 4L19 7",
   },
   {
     label: "View Feedbacks",
     path: "/view-feedbacks",
-    color: "yellow",
-    icon: "M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z",
+    color: "from-yellow-500 to-yellow-700",
+    hover: "hover:from-yellow-600 hover:to-yellow-800",
+    icon: "M7 8h10M7 12h8m-5 4h6",
   },
   {
     label: "Manage Users",
     path: "/manage-users",
-    color: "purple",
-    icon: "M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197",
+    color: "from-purple-500 to-purple-700",
+    hover: "hover:from-purple-600 hover:to-purple-800",
+    icon: "M17 20h5v-2a3 3 0 00-5-3m-6-7a4 4 0 110-8m5 14v-3m-10 3v-3",
   },
   {
     label: "View All Tenders",
     path: "/view-all-tenders",
-    color: "teal",
-    icon: "M3 12h18M3 6h18M3 18h18",
+    color: "from-teal-500 to-teal-700",
+    hover: "hover:from-teal-600 hover:to-teal-800",
+    icon: "M4 6h16M4 10h16M4 14h16M4 18h16",
+  },
+  {
+    label: "Decide Winner",
+    path: "/choice-dashboard",
+    color: "from-red-500 to-red-700",
+    hover: "hover:from-red-600 hover:to-red-800",
+    icon: "M9 12l2 2 4-4m0 9a9 9 0 110-18 9 9 0 010 18z",
   },
 ];
 
 const CityPage = memo(({ user }) => {
   const navigate = useNavigate();
 
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
-
   return (
-    <div className="container mx-auto px-6 py-8 min-h-screen bg-gray-50">
+    <div className="container mx-auto px-6 py-12 min-h-screen bg-gray-50">
       <header className="mb-10 text-center">
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
           Welcome, {user.name}
@@ -63,11 +72,11 @@ const CityPage = memo(({ user }) => {
         {BUTTON_CONFIG.map((button, index) => (
           <button
             key={index}
-            onClick={() => handleNavigation(button.path)}
-            className={`group relative px-6 py-4 bg-${button.color}-600 text-white font-medium rounded-xl 
-              hover:bg-${button.color}-700 focus:ring-4 focus:ring-${button.color}-300 
-              transition-all duration-300 ease-in-out transform hover:-translate-y-1 hover:shadow-lg 
-              flex items-center justify-center space-x-3`}
+            onClick={() => navigate(button.path)}
+            className={`relative flex items-center space-x-3 px-6 py-4 
+              bg-gradient-to-r ${button.color} text-white font-medium rounded-xl 
+              ${button.hover} focus:ring-4 focus:ring-opacity-50 
+              transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg`}
           >
             <svg
               className="w-6 h-6 flex-shrink-0"
