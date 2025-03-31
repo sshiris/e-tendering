@@ -1,6 +1,9 @@
 import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import CreateAdmin from "../CreateAdmin/CreateAdmin";
+import CreateCityAdmin from "../CreateCityAdmin/CreateCityAdmin";
+import CreateCityUser from "./CreateCityUser";
 
 const BUTTON_CONFIG = [
   {
@@ -13,7 +16,7 @@ const BUTTON_CONFIG = [
   {
     label: "Manage Categories",
     path: "/manage-categories",
-    color: "from-green-500 to-green-700", 
+    color: "from-green-500 to-green-700",
     hover: "hover:from-green-600 hover:to-green-800",
     icon: "M20 13V7a2 2 0 00-2-2H6a2 2 0 00-2 2v6M4 13l8 8m0 0l8-8m-8 8V4",
   },
@@ -51,6 +54,13 @@ const BUTTON_CONFIG = [
     color: "from-red-500 to-red-700",
     hover: "hover:from-red-600 hover:to-red-800",
     icon: "M9 12l2 2 4-4m0 9a9 9 0 110-18 9 9 0 010 18z",
+  },
+  {
+    label: "Create New Admin",
+    path: "/create-admin",
+    color: "from-indigo-500 to-indigo-700",
+    hover: "hover:from-indigo-600 hover:to-indigo-800",
+    icon: "M12 4v16m-4-4h8m-4-4h4m-4-4h2",
   },
 ];
 

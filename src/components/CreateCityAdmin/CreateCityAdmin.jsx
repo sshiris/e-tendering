@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import axios from "axios";
-import "./CreateCityAdmin.css";
 
 export default function CreateCityAdmin() {
   const [formData, setFormData] = useState({
@@ -25,9 +24,13 @@ export default function CreateCityAdmin() {
 
     try {
       // Check if email already exists
-      const emailCheckResponse = await axios.get(`${API_URL}/users?email=${formData.email}`);
+      const emailCheckResponse = await axios.get(
+        `${API_URL}/users?email=${formData.email}`
+      );
       if (emailCheckResponse.data.exists) {
-        setError("This email is already registered. Please use a different email.");
+        setError(
+          "This email is already registered. Please use a different email."
+        );
         return;
       }
 
@@ -41,7 +44,10 @@ export default function CreateCityAdmin() {
       setFormData({ name: "", address: "", password: "", email: "" });
       console.log("City admin created:", response.data);
     } catch (err) {
-      console.error("Error creating City admin:", err.response?.data || err.message);
+      console.error(
+        "Error creating City admin:",
+        err.response?.data || err.message
+      );
       setError("Failed to create City admin. Please try again.");
     }
   };
