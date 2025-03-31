@@ -1,16 +1,23 @@
+/**
+ * CityDashboard Component
+ * Acts as the central hub for managing tenders, users, categories, and city-related operations.
+ * Includes CRUD operations for tenders and users, as well as integration of various related components.
+ */
+
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import EditComponent from "./EditComponent";
 import CreateTender from "../CreateTender/CreateTender";
 import CreateUser from "../CreateUser/CreateUser";
-import UpdateUser from "../UpdateUser/UpdateUser"; // Import UpdateUser component
-import CategoryDashboard from "./CategoryDashboard"; // Import CategoryDashboard
-import CreateCityUser from "./CreateCityUser"; // Ensure CreateCityUser is imported
-import EditUser from "./EditUser"; // Import the new EditUser component
-import ChoiceDashboard from "./ChoiceDashboard"; // Import ChoiceDashboard
+import UpdateUser from "../UpdateUser/UpdateUser"; 
+import CategoryDashboard from "./CategoryDashboard"; 
+import CreateCityUser from "./CreateCityUser"; 
+import EditUser from "./EditUser"; 
+import ChoiceDashboard from "./ChoiceDashboard"; 
 import "./CityDashboard.css";
 
 export default function CityDashboard() {
+  // State variables to manage tenders, users, categories, and their modals/forms.
   const [tenders, setTenders] = useState([]);
   const [users, setUsers] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -21,14 +28,20 @@ export default function CityDashboard() {
   const [isCreatingUser, setIsCreatingUser] = useState(false);
   const [isEditingUser, setIsEditingUser] = useState(false);
   const [editingUserData, setEditingUserData] = useState(null);
+
+  // API base URL for server communication.
   const API_URL = "http://localhost:5500";
 
+  // Effect hook to fetch initial data on component mount.
   useEffect(() => {
     fetchTenders();
     fetchUsers();
     fetchCategories();
   }, []);
 
+  /**
+   * Fetches tenders from the server and updates the state.
+   */
   const fetchTenders = async () => {
     try {
       const response = await axios.get(`${API_URL}/find`);
@@ -38,6 +51,9 @@ export default function CityDashboard() {
     }
   };
 
+  /**
+   * Fetches users from the server and updates the state.
+   */
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${API_URL}/users`);
@@ -47,6 +63,9 @@ export default function CityDashboard() {
     }
   };
 
+  /**
+   * Fetches categories from the server and updates the state.
+   */
   const fetchCategories = async () => {
     try {
       const response = await axios.get(`${API_URL}/categories`);
@@ -56,6 +75,10 @@ export default function CityDashboard() {
     }
   };
 
+  /**
+   * Deletes a tender by ID and updates the state.
+   * @param {string} tenderId - The ID of the tender to delete.
+   */
   const handleDelete = async (tenderId) => {
     try {
       await axios.delete(`${API_URL}/delete_tender/${tenderId}`);
@@ -65,6 +88,10 @@ export default function CityDashboard() {
     }
   };
 
+  /**
+   * Opens the edit modal for a tender.
+   * @param {Object} tender - The tender data to edit.
+   */
   const handleEdit = (tender) => {
     setEditData(tender);
     setEditFields([
@@ -80,6 +107,10 @@ export default function CityDashboard() {
     setIsEditing(true);
   };
 
+  /**
+   * Saves updated tender data and updates the state.
+   * @param {Object} updatedData - The updated tender data.
+   */
   const handleSave = async (updatedData) => {
     try {
       if (updatedData.tender_id) {
@@ -96,25 +127,42 @@ export default function CityDashboard() {
     }
   };
 
+  /**
+   * Cancels editing or creating actions.
+   */
   const handleCancel = () => {
     setIsEditing(false);
     setIsCreating(false);
   };
 
+  /**
+   * Opens the form to create a new tender.
+   */
   const handleCreate = () => {
     setIsCreating(true);
   };
 
+  /**
+   * Opens the edit modal for a user.
+   * @param {Object} user - The user data to edit.
+   */
   const handleEditUser = (user) => {
-    setEditingUserData(user); // Set the user data to be edited
-    setIsEditingUser(true); // Open the UpdateUser form
+    setEditingUserData(user);
+    setIsEditingUser(true);
   };
 
+  /**
+   * Cancels editing a user.
+   */
   const handleCancelEditUser = () => {
-    setIsEditingUser(false); // Close the UpdateUser form
-    setEditingUserData(null); // Clear the editing user data
+    setIsEditingUser(false);
+    setEditingUserData(null);
   };
 
+  /**
+   * Updates user data and refreshes the state.
+   * @param {Object} updatedUser - The updated user data.
+   */
   const handleUpdateUser = async (updatedUser) => {
     try {
       const response = await axios.put(`${API_URL}/update_user/${updatedUser.user_id}`, updatedUser);
@@ -122,13 +170,17 @@ export default function CityDashboard() {
         prev.map((user) =>
           user.user_id === updatedUser.user_id ? response.data.updatedUser : user
         )
-      ); // Update the users list
-      setIsEditingUser(false); // Close the form
+      );
+      setIsEditingUser(false);
     } catch (error) {
       console.error("Error updating user:", error);
     }
   };
 
+  /**
+   * Deletes a user by ID and updates the state.
+   * @param {string} userId - The ID of the user to delete.
+   */
   const handleDeleteUser = async (userId) => {
     try {
       await axios.delete(`${API_URL}/delete_user/${userId}`);
@@ -138,24 +190,33 @@ export default function CityDashboard() {
     }
   };
 
+  /**
+   * Opens the form to create a new city user.
+   */
   const handleCreateCityUser = () => {
-    setIsCreatingUser(true); // Open the CreateUser form
+    setIsCreatingUser(true);
   };
 
+  /**
+   * Cancels the creation of a new city user.
+   */
   const handleCancelCreateUser = () => {
-    setIsCreatingUser(false); // Close the CreateUser form
+    setIsCreatingUser(false);
   };
-
   return (
+    // Main container for the city dashboard
     <div className="city-dashboard">
+      {/* Dashboard title */}
       <h1>City Dashboard</h1>
-
+  
       {/* Tenders Section */}
       <section>
         <h2>Manage Tenders</h2>
+        {/* Button to create a new tender */}
         <button onClick={handleCreate} className="create-btn">
           Create Tender
         </button>
+        {/* Table displaying list of tenders */}
         <table>
           <thead>
             <tr>
@@ -173,6 +234,7 @@ export default function CityDashboard() {
           </thead>
           <tbody>
             {tenders.map((tender) => (
+              // Render each tender in a table row
               <tr key={tender.tender_id}>
                 <td>{tender.tender_id}</td>
                 <td>{tender.tender_name}</td>
@@ -184,21 +246,26 @@ export default function CityDashboard() {
                 <td>{tender.bidding_price}</td>
                 <td>{tender.tender_status}</td>
                 <td>
+                  {/* Action buttons for editing or deleting a tender */}
                   <button onClick={() => handleEdit(tender)}>Update</button>
-                  <button onClick={() => handleDelete(tender.tender_id)}>Delete</button>
+                  <button onClick={() => handleDelete(tender.tender_id)}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </section>
-
+  
       {/* Users Section */}
       <section>
         <h2>Manage Users</h2>
+        {/* Button to create a new city user */}
         <button onClick={handleCreateCityUser} className="create-btn">
           Create City User
         </button>
+        {/* Table displaying list of users */}
         <table>
           <thead>
             <tr>
@@ -210,62 +277,71 @@ export default function CityDashboard() {
           </thead>
           <tbody>
             {users.map((user) => (
+              // Render each user in a table row
               <tr key={user.user_id}>
                 <td>{user.user_id}</td>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>
+                  {/* Action buttons for editing or deleting a user */}
                   <button onClick={() => handleEditUser(user)}>Edit</button>
-                  <button onClick={() => handleDeleteUser(user.user_id)}>Delete</button>
+                  <button onClick={() => handleDeleteUser(user.user_id)}>
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </section>
+  
+      {/* Create City User Form (conditionally rendered) */}
       {isCreatingUser && (
         <CreateCityUser
           onCancel={handleCancelCreateUser}
           onSuccess={(newUser) => {
-            setUsers((prev) => [...prev, { ...newUser, user_type: "City" }]); // Ensure user_type is "City"
+            // Add the newly created user to the users list
+            setUsers((prev) => [...prev, { ...newUser, user_type: "City" }]);
             setIsCreatingUser(false);
           }}
         />
       )}
+  
+      {/* Edit User Form (conditionally rendered) */}
       {isEditingUser && (
         <EditUser
-          initialData={editingUserData} // Pass the user data to be edited
-          onCancel={handleCancelEditUser} // Pass cancel handler
-          onSuccess={handleUpdateUser} // Pass success handler
+          initialData={editingUserData} // User data to edit
+          onCancel={handleCancelEditUser} // Cancel edit handler
+          onSuccess={handleUpdateUser} // Save changes handler
         />
       )}
-
+  
       {/* Categories Section */}
       <section>
         <CategoryDashboard />
       </section>
-
+  
       {/* Choice Dashboard Section */}
       <section>
         <ChoiceDashboard />
       </section>
-
-      {/* Edit Form */}
+  
+      {/* Edit Tender Form (conditionally rendered) */}
       {isEditing && (
         <EditComponent
-          data={editData}
-          fields={editFields}
-          onSave={handleSave}
-          onCancel={handleCancel}
+          data={editData} // Tender data to edit
+          fields={editFields} // Editable fields
+          onSave={handleSave} // Save changes handler
+          onCancel={handleCancel} // Cancel edit handler
         />
       )}
-
-      {/* Create Tender Form */}
+  
+      {/* Create Tender Form (conditionally rendered) */}
       {isCreating && (
         <CreateTender
-          setTenders={setTenders}
-          fetchTenders={fetchTenders}
-          onCancel={handleCancel}
+          setTenders={setTenders} // Update tenders state
+          fetchTenders={fetchTenders} // Refresh tenders
+          onCancel={handleCancel} // Cancel create handler
         />
       )}
     </div>
