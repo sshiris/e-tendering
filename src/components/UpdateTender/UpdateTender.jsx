@@ -92,7 +92,9 @@ export default function UpdateTender({ tenders, fetchTenders, user_id }) {
       <div className="create-tender">
         <h3>Update Tender</h3>
         <p>{error}</p>
-        <button onClick={() => navigate("/")}>Back to Tenders</button>
+        <button onClick={() => navigate("/tender/${tender.tender_id}/details")}>
+          Back to Tenders
+        </button>
       </div>
     );
   }

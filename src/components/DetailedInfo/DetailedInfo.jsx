@@ -51,7 +51,13 @@ export default function DetailedTenderInfo({
       <div className="not-found">
         <h2>Tender Details</h2>
         <p>Tender not found</p>
-        <button onClick={() => navigate("/")}>Back to Tenders</button>
+        <button
+          onClick={() =>
+            isCity ? navigate("/view-all-tenders") : navigate("/list")
+          }
+        >
+          Back to Tenders
+        </button>
       </div>
     );
   }
@@ -87,11 +93,13 @@ export default function DetailedTenderInfo({
             {tender.construction_to.slice(0, 16).replace("T", " ")}
           </p>
         </div>
-        <div className="detail-row">
-          <p>
-            <strong>Estimated Tender Price:</strong> {tender.bidding_price}
-          </p>
-        </div>
+        {(isCity || tender.tender_status != "Open") && (
+          <div className="detail-row">
+            <p>
+              <strong>Estimated Tender Price:</strong> {tender.bidding_price}
+            </p>
+          </div>
+        )}
         <div className="detail-row">
           <p>
             <strong>Status:</strong> {tender.tender_status}
@@ -120,7 +128,13 @@ export default function DetailedTenderInfo({
               Delete
             </button>
           )}
-          <button onClick={() => navigate("/")}>Back</button>
+          <button
+            onClick={() =>
+              isCity ? navigate("/view-all-tenders") : navigate("/list")
+            }
+          >
+            Back
+          </button>
         </div>
       </div>
     </div>
