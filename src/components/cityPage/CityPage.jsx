@@ -1,3 +1,13 @@
+/**
+ * CityPage Component
+ * A memoized component that renders a dashboard interface for managing city-related actions.
+ * Includes buttons for various functionalities such as creating tenders, managing categories, 
+ * viewing feedbacks, deciding winners, and more.
+ *
+ * @param {Object} user - The user object containing user information.
+ * @param {string} user.name - The name of the user displayed in the dashboard header.
+ */
+
 import React, { memo } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -5,13 +15,14 @@ import CreateAdmin from "../CreateAdmin/CreateAdmin";
 import CreateCityAdmin from "../CreateCityAdmin/CreateCityAdmin";
 import CreateCityUser from "./CreateCityUser";
 
+// Configuration for buttons displayed on the dashboard.
 const BUTTON_CONFIG = [
   {
-    label: "Create New Tender",
-    path: "/create-tender",
-    color: "from-blue-500 to-blue-700",
-    hover: "hover:from-blue-600 hover:to-blue-800",
-    icon: "M12 4v16m8-8H4",
+    label: "Create New Tender", // Button label
+    path: "/create-tender", // Navigation path
+    color: "from-blue-500 to-blue-700", // Gradient color for the button background
+    hover: "hover:from-blue-600 hover:to-blue-800", // Hover effect
+    icon: "M12 4v16m8-8H4", // SVG icon path
   },
   {
     label: "Manage Categories",
@@ -65,10 +76,12 @@ const BUTTON_CONFIG = [
 ];
 
 const CityPage = memo(({ user }) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // Hook for navigation between routes
 
   return (
+    // Main container for the dashboard
     <div className="container mx-auto px-6 py-12 min-h-screen bg-gray-50">
+      {/* Header section */}
       <header className="mb-10 text-center">
         <h1 className="text-4xl font-extrabold text-gray-900 tracking-tight">
           Welcome, {user.name}
@@ -78,16 +91,18 @@ const CityPage = memo(({ user }) => {
         </p>
       </header>
 
+      {/* Grid layout for buttons */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {BUTTON_CONFIG.map((button, index) => (
           <button
-            key={index}
-            onClick={() => navigate(button.path)}
+            key={index} // Unique key for each button
+            onClick={() => navigate(button.path)} // Navigate to the corresponding route
             className={`relative flex items-center space-x-3 px-6 py-4 
               bg-gradient-to-r ${button.color} text-white font-medium rounded-xl 
               ${button.hover} focus:ring-4 focus:ring-opacity-50 
               transition-all duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg`}
           >
+            {/* Icon for each button */}
             <svg
               className="w-6 h-6 flex-shrink-0"
               fill="none"
@@ -103,6 +118,7 @@ const CityPage = memo(({ user }) => {
               />
             </svg>
             <span className="text-center">{button.label}</span>
+            {/* Hover overlay effect */}
             <span className="absolute inset-0 rounded-xl bg-white opacity-0 group-hover:opacity-10 transition-opacity" />
           </button>
         ))}
@@ -111,12 +127,14 @@ const CityPage = memo(({ user }) => {
   );
 });
 
+// PropTypes for type-checking the user prop
 CityPage.propTypes = {
   user: PropTypes.shape({
-    name: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired, // Name is required as a string
   }).isRequired,
 };
 
+// Component name for debugging
 CityPage.displayName = "CityPage";
 
 export default CityPage;

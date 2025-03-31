@@ -1,12 +1,21 @@
+/**
+ * CitizenPage Component
+ * Renders a citizen interface for exploring tenders and projects.
+ * @param {Object} user - User object containing user information.
+ * @param {string} user.name - The name of the user to personalize the page.
+ */
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const CitizenPage = ({ user }) => {
+  // useNavigate hook to navigate programmatically between routes.
   const navigate = useNavigate();
 
   return (
+    // Main container with responsive layout and styling.
     <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        {/* Header section for welcoming the user */}
         <div className="text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl">
             Welcome, {user.name}!
@@ -17,8 +26,10 @@ const CitizenPage = ({ user }) => {
           </p>
         </div>
 
+        {/* Section for tender management options */}
         <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
           <div className="p-6">
+            {/* Section title */}
             <div className="flex items-center mb-4">
               <svg
                 className="h-8 w-8 text-blue-500 mr-3"
@@ -37,13 +48,18 @@ const CitizenPage = ({ user }) => {
                 Tender Management
               </h2>
             </div>
+
+            {/* Buttons for navigating to different tender pages */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              {/* Button for viewing open tenders */}
               <button
                 onClick={() => navigate("/citizen/open-tenders")}
                 className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
               >
                 View Open Tenders
               </button>
+
+              {/* Button for viewing closed tenders */}
               <button
                 onClick={() => navigate("/citizen/closed-tenders")}
                 className="px-6 py-2 bg-gray-600 text-white font-semibold rounded-lg hover:bg-gray-700 transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"

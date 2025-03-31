@@ -1,19 +1,31 @@
+/**
+ * OpenTenders Component
+ * Renders a page displaying tenders with "Open" status. 
+ * Includes navigation and interaction functionality for feedback and details.
+ * @param {Array} tenders - Array of tender objects.
+ */
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
 const OpenTenders = ({ tenders }) => {
+  // Hook to manage navigation between routes programmatically.
   const navigate = useNavigate();
+
+  // Filters the provided tenders to display only those with an "Open" status.
   const openTenders = tenders.filter(
     (tender) => tender.tender_status === "Open"
   );
 
+  // Function to navigate back to the previous page.
   const handleGoBack = () => {
     navigate(-1);
   };
 
   return (
+    // Container for the page with responsive layout and styled background.
     <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
+        {/* Header with title and navigation button */}
         <div className="mb-8 flex justify-between items-center">
           <h1 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
             Open Tenders
@@ -26,20 +38,25 @@ const OpenTenders = ({ tenders }) => {
           </button>
         </div>
 
+        {/* Conditional rendering based on availability of open tenders */}
         {openTenders.length > 0 ? (
+          // Displays a grid of open tenders
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {openTenders.map((tender) => (
               <div
-                key={tender.tender_id}
+                key={tender.tender_id} // Unique key for rendering items in a list
                 className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="p-6">
+                  {/* Tender title */}
                   <h2 className="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">
                     {tender.tender_name}
                   </h2>
+                  {/* Tender description */}
                   <p className="text-gray-600 mb-4 line-clamp-2">
                     {tender.description}
                   </p>
+                  {/* Closing date */}
                   <div className="flex items-center text-sm text-gray-500 mb-4">
                     <svg
                       className="h-5 w-5 mr-2 text-gray-400"
@@ -57,6 +74,7 @@ const OpenTenders = ({ tenders }) => {
                     Closes:{" "}
                     {new Date(tender.date_of_tender_close).toLocaleDateString()}
                   </div>
+                  {/* Buttons for feedback and details */}
                   <div className="flex flex-col sm:flex-row gap-3">
                     <button
                       onClick={() =>
@@ -82,6 +100,7 @@ const OpenTenders = ({ tenders }) => {
             ))}
           </div>
         ) : (
+          // Placeholder message when no open tenders are available
           <div className="text-center py-12 bg-white rounded-xl shadow-md">
             <svg
               className="mx-auto h-12 w-12 text-gray-400"
