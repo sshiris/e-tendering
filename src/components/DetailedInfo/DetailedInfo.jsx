@@ -26,7 +26,7 @@ export default function DetailedTenderInfo({
           .delete(`${API_URL}/delete_tender/${tender.tender_id}`)
           .then(async () => {
             await fetchTenders();
-            navigate("/");
+            navigate(-1);
           })
           .catch((error) => {
             console.error("Error deleting tender:", error);

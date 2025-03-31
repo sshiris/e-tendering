@@ -86,7 +86,7 @@ const CompanyBids = ({ user }) => {
                 </p>
               ) : (
                 <p className="mt-4 text-red-600 font-semibold">
-                  ❌ You did not win this bid.
+                  You did not win this bid.
                 </p>
               )}
             </div>

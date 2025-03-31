@@ -29,6 +29,7 @@ import CityPage from "./components/cityPage/cityPage";
 import ManageCategories from "./components/cityPage/ManageCategories";
 import ManageUserCategories from "./components/cityPage/ManageUserCategories";
 import ManageUsers from "./components/cityPage/ManageUsers";
+import CompanyApplication from "./components/companyPage/CompanyApplication";
 import ViewAllTenders from "./components/cityPage/ViewAllTenders";
 import CreateAdmin from "./components/CreateAdmin/CreateAdmin";
 import ChoiceDashboard from "./components/cityPage/ChoiceDashboard";
@@ -402,6 +403,7 @@ function App() {
               )
             }
           />
+          <Route path="/submit-application" element={<CompanyApplication />} />
           <Route
             path="/create-admin"
             element={isCity ? <CreateAdmin /> : <Navigate to="/login" />}

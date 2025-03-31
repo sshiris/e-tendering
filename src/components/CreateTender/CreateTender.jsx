@@ -35,7 +35,7 @@ export default function CreateTender({ setTenders, fetchTenders }) {
         await fetchTenders();
       }
       console.log("Tender added successfully:", response.data);
-      navigate("/");
+      navigate(-1);
     } catch (error) {
       console.error("Error adding tender:", error);
       setError(error.response?.data?.message || "Failed to add tender");
